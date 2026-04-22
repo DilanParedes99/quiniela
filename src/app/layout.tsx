@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "QUINIELA",
-  description: "Quiniela mundial 2026",
+  title: "MARCO POLO AGUIRRE",
+  description: "Página oficial de Marco Polo Aguirre",
 };
 
 export default function RootLayout({
