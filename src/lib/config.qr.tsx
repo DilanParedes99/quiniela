@@ -1,3 +1,3 @@
 export const qrConfig = {
-  mode: "bases", // "bases" | "quiniela"
+  mode: "quiniela", // "bases" | "quiniela"
 };
