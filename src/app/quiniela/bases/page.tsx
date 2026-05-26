@@ -88,6 +88,24 @@ export default function QuinielaPage() {
               />
             </div>
 
+            <div className="flex items-start gap-3 mt-2">
+              <input
+                type="checkbox"
+                id="acepto-bases"
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-red-700 cursor-pointer shrink-0"
+              />
+              <label
+                htmlFor="acepto-bases"
+                className="text-xs text-gray-500 leading-relaxed cursor-pointer"
+              >
+                He leído y acepto las{" "}
+                <Link href="/bases" className="text-red-700 hover:underline">
+                  bases oficiales
+                </Link>{" "}
+                de la Quiniela Ciudadana MarcoPolo 2026.
+              </label>
+            </div>
+
             <button className="w-full mt-2 py-3 bg-red-700 hover:bg-red-800 text-white text-sm font-extrabold tracking-widest uppercase rounded-lg transition-colors">
               Registrarme →
             </button>
