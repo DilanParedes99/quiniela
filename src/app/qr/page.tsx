@@ -2,5 +2,14 @@ import { redirect } from "next/navigation";
 import { qrConfig } from "@/lib/config.qr";
 
 export default function QRPage() {
-  qrConfig.mode === "bases" ? redirect("/bases") : redirect("/quiniela");
+  switch (qrConfig.mode) {
+    case "juego":
+      redirect("/juego");
+      break;
+    case "bases":
+      redirect("/bases");
+      break;
+    default:
+      redirect("/");
+  }
 }
