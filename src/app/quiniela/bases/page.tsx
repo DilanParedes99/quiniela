@@ -172,8 +172,7 @@ const secciones = [
           { fase: "Final", premio: "Jerseys" },
           {
             fase: "Acumulado",
-            premio:
-              "Kit Final en Equipo: parrilla portátil, hielera, sillas plegables, kit botanero",
+            premio: `Kit "Final en Equipo": parrilla portátil, hielera, sillas plegables, kit botanero`,
           },
         ].map(({ fase, premio }) => (
           <div

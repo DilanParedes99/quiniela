@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
 
   async rewrites() {
     return [
+      /*        esta parte se muestra     esta es la direcion del archivo que se va a mostrar       */
       { source: "/juego", destination: "/quiniela" },
       { source: "/bases", destination: "/quiniela/bases" },
     ];
