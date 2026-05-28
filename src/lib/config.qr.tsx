@@ -1,3 +1,3 @@
 export const qrConfig = {
-  mode: "juego", // "bases" | "quiniela"
+  mode: "inicio", // "bases" | "quiniela"
 };
