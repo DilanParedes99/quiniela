@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Confetti from "../app/components/confeti";
+import AnimatedTitle from "../app/components/AnimatedTitle";
 
 const TARGET = new Date("2026-06-11T13:00:00-06:00");
 
@@ -46,58 +47,7 @@ export default function Home() {
     <div className="min-h-screen flex items-center justify-center bg-[#F4D5AA]">
       <Confetti />
       <div className="text-center">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <div className="h-[2px] w-25 bg-white" />
-          <span
-            className={`${anton.className} block w-full text-center whitespace-nowrap uppercase`}
-            style={
-              {
-                fontSize: "clamp(1.6rem, 7vw, 3.2rem)",
-                lineHeight: ".95",
-                letterSpacing: ".02em",
-                color: "#011933",
-                WebkitTextStroke: "7px #fff",
-                paintOrder: "stroke fill",
-              } as React.CSSProperties
-            }
-          >
-            Juega en Equipo
-          </span>
-          <div className="h-[2px] w-25 bg-white" />
-        </div>
-
-        <span
-          className={`${anton.className} block w-full text-center whitespace-nowrap uppercase`}
-          style={
-            {
-              fontSize: "clamp(1.6rem, 4vw, 3.2rem)",
-              lineHeight: ".95",
-              letterSpacing: ".02em",
-              color: "#000000",
-              WebkitTextStroke: "9px #fff",
-              paintOrder: "stroke fill",
-              marginBottom: ".5em",
-            } as React.CSSProperties
-          }
-        >
-          con
-        </span>
-        <span
-          className={`${anton.className} block w-full text-center whitespace-nowrap uppercase`}
-          style={
-            {
-              fontSize: "clamp(2.8rem, 17vw, 5.5rem)",
-              lineHeight: ".95",
-              letterSpacing: ".02em",
-              color: "#8D0302",
-              WebkitTextStroke: "9px #fff",
-              paintOrder: "stroke fill",
-              marginBottom: ".5em",
-            } as React.CSSProperties
-          }
-        >
-          Marcopolo
-        </span>
+        <AnimatedTitle />
 
         {/* Mientras hidrata, muestra skeleton para evitar layout shift */}
         {time === null ? (
