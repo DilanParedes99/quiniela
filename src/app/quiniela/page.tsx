@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Anton, Black_Ops_One } from "next/font/google";
+import { Anton } from "next/font/google";
 
 const anton = Anton({ weight: "400", subsets: ["latin"] });
 
@@ -140,10 +140,6 @@ export default function QuinielaPage() {
               />
             </div>
 
-            <button className="w-full mt-2 py-3 bg-red-700 hover:bg-red-800 text-white text-sm font-extrabold tracking-widest uppercase rounded-lg transition-colors border-2 border-[#181D3A]">
-              Registrarme
-            </button>
-
             <div className="flex items-start gap-3 mt-2">
               <input
                 type="checkbox"
@@ -161,6 +157,9 @@ export default function QuinielaPage() {
                 de la Quiniela Ciudadana MarcoPolo 2026.
               </label>
             </div>
+            <button className="w-full mt-2 py-3 bg-red-700 hover:bg-red-800 text-white text-sm font-extrabold tracking-widest uppercase rounded-lg transition-colors border-2 border-[#181D3A]">
+              Registrarme
+            </button>
 
             <p className="text-xs text-gray-400 text-center leading-relaxed">
               Tus datos serán utilizados únicamente para fines de registro,
