@@ -55,7 +55,7 @@ export default function Sparkles({ containerRef }: SparklesProps) {
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
-        this.decay = 0.012 + Math.random() * 0.018;
+        this.decay = 0.02 + Math.random() * 0.025; // antes 0.012
         this.radius = 2 + Math.random() * 2;
         this.gravity = 0.06;
         this.trail = [];
@@ -131,11 +131,15 @@ export default function Sparkles({ containerRef }: SparklesProps) {
         ctx!.fill();
       }
       explode(particles: Particle[]) {
-        const count = 50 + Math.floor(Math.random() * 30);
+        const count = 30 + Math.floor(Math.random() * 20); // antes 60-100
         for (let i = 0; i < count; i++)
           particles.push(new Particle(this.x, this.y, this.color));
         const color2 = COLORS[Math.floor(Math.random() * COLORS.length)];
-        for (let i = 0; i < 15; i++)
+        for (
+          let i = 0;
+          i < 8;
+          i++ // antes 15-20
+        )
           particles.push(new Particle(this.x, this.y, color2));
       }
     }
@@ -144,7 +148,12 @@ export default function Sparkles({ containerRef }: SparklesProps) {
     let particles: Particle[] = [];
     let animId: number;
 
-    const interval = setInterval(() => rockets.push(new Rocket()), 900);
+    const interval = setInterval(() => {
+      if (particles.length < 150) {
+        // máximo 150 partículas activas
+        rockets.push(new Rocket());
+      }
+    }, 900);
     setTimeout(() => rockets.push(new Rocket()), 100);
     setTimeout(() => rockets.push(new Rocket()), 500);
 

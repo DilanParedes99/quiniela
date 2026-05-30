@@ -49,3 +49,26 @@ body {
     background-position: bottom center;
   }
 }
+
+.header-bg {
+  position: relative;
+}
+
+.header-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/catedral.png");
+  background-repeat: no-repeat;
+  background-position: bottom center; /* antes top center */
+  background-size: 100% auto;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+@media (min-width: 768px) {
+  .header-bg {
+    background-size: 60% auto;
+    background-position: bottom center;
+  }
+}

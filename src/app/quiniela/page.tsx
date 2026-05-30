@@ -12,27 +12,37 @@ export default function QuinielaPage() {
   const headerRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
 
   return (
-    <div className="bg-[#E6E6E6] min-h-screen ">
-      <div className="relative z-10 px-2 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-2">
-        {/* Header — fuegos artificiales acotados aquí */}
-        <div
-          ref={headerRef}
-          className="relative flex justify-center mb-[-3rem] z-20 overflow-hidden"
-          style={{ minHeight: 240 }}
-        >
-          <Sparkless containerRef={headerRef} />
-          <Image
-            src="/perfilP.png"
-            alt="MarcoPolo"
-            width={270}
-            height={220}
-            className="object-contain drop-shadow-lg relative z-10"
-            priority
-          />
+    <div className="bg-[#E6E6E6] min-h-screen">
+      <div className="relative z-10 px-2 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
+        {/* Wrapper que contiene catedral + MarcoPolo flotante */}
+        <div ref={headerRef} className="relative">
+          {/* MarcoPolo encima, centrado, montado sobre el borde */}
+          <div
+            className="header-bg absolute bottom-0 left-0 right-0 flex justify-center z-40"
+            style={{
+              height: 350,
+              transform: "translateY(25%)",
+              marginTop: "-8rem",
+            }}
+          >
+            <Sparkless containerRef={headerRef} />
+            <Image
+              src="/perfilP.png"
+              alt="MarcoPolo"
+              width={270}
+              height={220}
+              className="object-contain drop-shadow-lg"
+              priority
+            />
+          </div>
         </div>
 
-        {/* Formulario centrado */}
-        <div className="max-w-lg mx-auto bg-[#FFFFFF] rounded-xl border-6 border-[#8D0302] shadow-lg shadow-[#b4aeae] p-5">
+        {/* Formulario — con padding top para dar espacio a la imagen flotante */}
+        <div
+          className="max-w-lg mx-auto bg-[#FFFFFF] rounded-b-xl rounded-t-none border-6 border-[#8D0302] shadow-lg shadow-[#b4aeae] p-5 relative z-30"
+          style={{ paddingTop: "2rem" }}
+        >
+          {" "}
           <h1 className="text-lg font-extrabold text-center tracking-widest uppercase text-[#031D2D] mb-1">
             REGíSTRATE Y PARTICIPA
           </h1>
@@ -42,14 +52,12 @@ export default function QuinielaPage() {
           <p className="text-xs font-extrabold text-center tracking-widest uppercase text-[#9B100B] mb-1">
             ¡ES GRATIS!
           </p>
-
           <Link
             href="/quiniela/bases"
             className="inline-flex items-center gap-1 text-sm text-[#8D0302] hover:underline mb-5"
           >
             Ver bases oficiales →
           </Link>
-
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-extrabold text-[#031D2D] mb-1 tracking-wide uppercase">
