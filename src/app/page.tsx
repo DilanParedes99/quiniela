@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Confetti from "../app/components/confeti";
 import AnimatedTitle from "../app/components/AnimatedTitle";
 
+import Link from "next/link";
+import Image from "next/image";
 const TARGET = new Date("2026-06-11T13:00:00-06:00");
 
 function pad(n: number) {
@@ -20,10 +22,6 @@ function getTimeLeft() {
     secs: pad((diff % 6e4) / 1e3),
   };
 }
-
-import { Anton } from "next/font/google";
-
-const anton = Anton({ weight: "400", subsets: ["latin"] });
 
 export default function Home() {
   // ✅ null en el servidor, nunca toca Date.now() en SSR
@@ -44,58 +42,73 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F4D5AA]">
+    <div className="hero-bg min-h-screen flex flex-col items-center bg-[#F8F4B8] relative">
       <Confetti />
-      <div className="text-center">
-        <AnimatedTitle />
 
-        {/* Mientras hidrata, muestra skeleton para evitar layout shift */}
-        {time === null ? (
-          <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-6">
-            {units.map(({ id, label }) => (
-              <div
-                key={id}
-                className="bg-white rounded-xl border border-gray-200 pt-4 pb-3 px-2"
-              >
-                <span className="block text-5xl font-extrabold text-gray-300 leading-none mb-1">
-                  --
-                </span>
-                <span className="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
-                  {label}
-                </span>
-              </div>
-            ))}
+      {/* Contenido central */}
+      <div className="relative z-10 flex-1 flex items-center justify-center w-full">
+        <div className="text-center">
+          {/* PNG pegado al fondo */}
+
+          <AnimatedTitle />
+          <div className="w-full flex justify-center mt-auto">
+            <Image
+              src="/mpa2.png"
+              alt="MarcoPolo juega en equipo"
+              width={320}
+              height={200}
+              className=""
+            />
           </div>
-        ) : time ? (
-          <>
-            <p className="text-xs font-semibold tracking-widest text-[#031D2D] uppercase mb-4">
-              México vs Sudáfrica · Estadio Banorte · 11 jun 2026
-            </p>
+          {time === null ? (
             <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-6">
-              {units.map(({ id, label, value }) => (
+              {units.map(({ id, label }) => (
                 <div
                   key={id}
                   className="bg-white rounded-xl border border-gray-200 pt-4 pb-3 px-2"
                 >
-                  <span className="block text-5xl font-extrabold text-gray-900 leading-none mb-1 tabular-nums">
-                    {value}
+                  <span className="block text-5xl font-extrabold text-gray-300 leading-none mb-1">
+                    --
                   </span>
-                  <span className="text-[11px] font-semibold tracking-widest text-[#031D2D] uppercase">
+                  <span className="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
                     {label}
                   </span>
                 </div>
               ))}
             </div>
-            <span className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-xs text-[#031D2D]">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              Partido inaugural · 13:00 h (CDMX)
-            </span>
-          </>
-        ) : (
-          <p className="text-green-600 font-bold text-2xl tracking-wide">
-            ¡Ya comenzó!
-          </p>
-        )}
+          ) : time ? (
+            <>
+              <p className="text-xs font-semibold tracking-widest text-[#031D2D] uppercase mb-4">
+                Quiniela Ciudadana Mundial 2026
+              </p>
+              <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-10">
+                {units.map(({ id, label, value }) => (
+                  <div
+                    key={id}
+                    className="bg-white rounded-xl border border-gray-200 pt-4 pb-3 px-2"
+                  >
+                    <span className="block text-5xl font-extrabold text-gray-900 leading-none mb-1 tabular-nums">
+                      {value}
+                    </span>
+                    <span className="text-[11px] font-semibold tracking-widest text-[#031D2D] uppercase">
+                      {label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/juego"
+                className="inline-flex items-center gap-2 bg-[#8D0302] hover:bg-[#6e0202] transition-colors rounded-full px-6 py-2.5 text-sm font-bold text-white tracking-wide uppercase"
+              >
+                registrate
+              </Link>
+            </>
+          ) : (
+            <p className="text-green-600 font-bold text-2xl tracking-wide">
+              ¡Ya comenzó!
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

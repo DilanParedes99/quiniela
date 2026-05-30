@@ -25,3 +25,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.hero-bg {
+  overflow: hidden;
+}
+
+.hero-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/catedral.png");
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 150% auto;
+  opacity: 0.3;
+  z-index: 0;
+}

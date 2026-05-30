@@ -7,11 +7,20 @@ const anton = Anton({ weight: "400", subsets: ["latin"] });
 
 export default function QuinielaPage() {
   return (
-    <div className="bg-[#F4D5AA] min-h-screen">
+    <div className="bg-[#F4D5AA] min-h-screen ">
       <div className="px-2 py-2 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
         {/* Header */}
         <div className="w-full overflow-hidden px-4 pt-2 pb-6">
-          <div
+          <div className="w-full flex justify-center mt-auto">
+            <Image
+              src="/mpa2.png"
+              alt="MarcoPolo juega en equipo"
+              width={200}
+              height={200}
+              className=""
+            />
+          </div>
+          {/* <div
             className="w-full flex flex-col items-stretch py-2"
             style={{ transform: "rotate(-4deg)" }}
           >
@@ -64,7 +73,7 @@ export default function QuinielaPage() {
                 Quiniela Ciudadana Mundial 2026
               </span>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Formulario centrado */}
@@ -168,6 +177,15 @@ export default function QuinielaPage() {
             </p>
           </div>
         </div>
+        {/* <div className="w-full flex justify-center mt-auto">
+          <Image
+            src="/mpa2.png"
+            alt="MarcoPolo juega en equipo"
+            width={200}
+            height={200}
+            className=""
+          />
+        </div> */}
       </div>
     </div>
   );

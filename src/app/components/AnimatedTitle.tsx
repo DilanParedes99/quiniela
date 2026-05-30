@@ -2,28 +2,50 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Anton } from "next/font/google";
+import { Montserrat } from "next/font/google";
 
-const anton = Anton({ weight: "400", subsets: ["latin"] });
+const montserrat = Montserrat({ weight: "900", subsets: ["latin"] });
 
 const lines = [
   {
     text: "JUEGA EN EQUIPO",
-    fontSize: "clamp(1.6rem, 7vw, 3.2rem)",
-    color: "#011933",
-    stroke: "6px #fff",
+    fontSize: "clamp(1.6rem, 4vw, 3.2rem)",
+    letterSpacing: "0.4rem",
+    color: "#ffffff",
+    stroke: "10px #0B8D38",
+    textShadow: [
+      // sombra dura más larga y sólida
+      "10px 10px 10px #7A7862",
+    ].join(", "),
   },
   {
     text: "CON",
-    fontSize: "clamp(1.6rem, 4vw, 3.2rem)",
-    color: "#000000",
-    stroke: "7px #fff",
+    fontSize: "clamp(1.6rem, 3vw, 3.2rem)",
+    color: "#ffffff",
+    stroke: "10px #0B8D38",
+    textShadow: [
+      // sombra dura más larga y sólida
+      "10px 10px 10px #7A7862",
+    ].join(", "),
+    letterSpacing: "0.4rem",
   },
   {
-    text: "MARCOPOLO",
-    fontSize: "clamp(2.8rem, 17vw, 5.5rem)",
-    color: "#8D0302",
-    stroke: "9px #fff",
+    text: "MarcoPolo",
+    fontSize: "clamp(1.8rem, 15vw, 7rem)",
+    color: "#820D17",
+    stroke: "0px transparent",
+    letterSpacing: "0.02rem",
+    textShadow: [
+      "-4px -4px 0 #fff",
+      " 4px -4px 0 #fff",
+      "-4px  4px 0 #fff",
+      " 4px  4px 0 #fff",
+      "-4px  0px 0 #fff",
+      " 4px  0px 0 #fff",
+      " 0px -4px 0 #fff",
+      " 0px  4px 0 #fff",
+      "15px 14px 10px #7A7862",
+    ].join(", "),
   },
 ];
 
@@ -49,15 +71,13 @@ const letter = {
 
 export default function AnimatedTitle() {
   return (
-    <div className="text-center mb-6">
+    <div className="text-center ">
       {/* Líneas decorativas solo en la primera línea */}
-      <div className="flex items-center justify-center gap-4 mb-2">
-        <div className="h-[2px] w-20 bg-white" />
-        <AnimatedLine {...lines[0]} />
-        <div className="h-[2px] w-20 bg-white" />
+      {/* <div className="flex items-center justify-center gap-4 mb-4">
+        <AnimatedLine {...lines[0]} className="mb-2" />
       </div>
 
-      <AnimatedLine {...lines[1]} className="mb-1" />
+      <AnimatedLine {...lines[1]} className="mb-4" /> */}
       <AnimatedLine {...lines[2]} className="mb-2" />
     </div>
   );
@@ -67,13 +87,17 @@ function AnimatedLine({
   text,
   fontSize,
   color,
+  letterSpacing,
   stroke,
+  textShadow,
   className = "",
 }: {
   text: string;
   fontSize: string;
   color: string;
+  letterSpacing?: string;
   stroke: string;
+  textShadow: string;
   className?: string;
 }) {
   return (
@@ -87,15 +111,16 @@ function AnimatedLine({
         <motion.span
           key={i}
           variants={letter}
-          className={anton.className}
+          className={montserrat.className}
           style={
             {
               fontSize,
               lineHeight: 0.95,
-              letterSpacing: "0.02em",
+              letterSpacing: letterSpacing || "0.02em",
               color,
               WebkitTextStroke: stroke,
               paintOrder: "stroke fill",
+              textShadow,
               display: "inline-block",
               whiteSpace: char === " " ? "pre" : "normal",
             } as React.CSSProperties

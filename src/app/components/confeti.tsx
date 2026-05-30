@@ -45,7 +45,7 @@ export default function Confetti() {
     let animId: number;
     let particles: Particle[] = [];
     let elapsed = 0;
-    const DURATION = 40000; // ms emitiendo partículas
+    const DURATION = 80000; // ms emitiendo partículas
     const EMIT_RATE = 1; // partículas por frame al inicio
 
     function resize() {
