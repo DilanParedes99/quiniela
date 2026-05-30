@@ -42,7 +42,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="hero-bg min-h-screen flex flex-col items-center bg-[#F8F4B8] relative">
+    <div className="hero-bg min-h-screen flex flex-col items-center bg-[#E6E6E6] relative">
       <Confetti />
 
       {/* Contenido central */}
