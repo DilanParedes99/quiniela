@@ -41,3 +41,11 @@ body {
   opacity: 0.3;
   z-index: 0;
 }
+
+/* En desktop la catedral se ve bien más pequeña */
+@media (min-width: 768px) {
+  .hero-bg::before {
+    background-size: 40% auto;
+    background-position: bottom center;
+  }
+}

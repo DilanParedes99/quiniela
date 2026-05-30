@@ -79,7 +79,7 @@ export default function Home() {
           ) : time ? (
             <>
               <p className="text-xs font-semibold tracking-widest text-[#031D2D] uppercase mb-4">
-                Quiniela Ciudadana Mundial 2026
+                México vs Sudáfrica · Estadio Banorte · 11 jun 2026
               </p>
               <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-10">
                 {units.map(({ id, label, value }) => (

@@ -118,8 +118,6 @@ function AnimatedLine({
               lineHeight: 0.95,
               letterSpacing: letterSpacing || "0.02em",
               color,
-              WebkitTextStroke: stroke,
-              paintOrder: "stroke fill",
               textShadow,
               display: "inline-block",
               whiteSpace: char === " " ? "pre" : "normal",
