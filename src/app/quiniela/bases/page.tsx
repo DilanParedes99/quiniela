@@ -39,7 +39,7 @@ const secciones = [
           Registros independientes por cada fase del Mundial, a través de
           formularios distintos habilitados conforme avance el torneo.
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 mb-4">
           {[
             "1. Octavos de Final",
             "2. Cuartos de Final",
@@ -50,6 +50,10 @@ const secciones = [
               <p className="text-xs font-bold text-red-700">{fase}</p>
             </div>
           ))}
+        </div>
+        <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
+          Cada participante únicamente podrá realizar un registro por fase,
+          validado mediante el número telefónico proporcionado en el formulario.
         </div>
       </div>
     ),
@@ -85,32 +89,144 @@ const secciones = [
   {
     label: "Periodos de registro",
     content: (
-      <p className="text-sm text-gray-600 leading-relaxed">
-        El registro para cada fase cerrará antes del inicio del primer partido
-        correspondiente. No se aceptarán registros posteriores al inicio oficial
-        de los encuentros. Las fechas exactas se indicarán en la plataforma
-        digital.
-      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr className="bg-red-50">
+              {["Fase", "Periodo de registro", "Cierre"].map((h) => (
+                <th
+                  key={h}
+                  className="text-left text-red-700 font-bold px-2 py-2 border-b border-red-100 uppercase tracking-wide"
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["Octavos", "28 jun – 3 jul 2026", "23:59 hrs"],
+              ["Cuartos", "4 – 8 jul 2026", "23:59 hrs"],
+              ["Semifinal", "9 – 13 jul 2026", "23:59 hrs"],
+              ["Final", "14 – 18 jul 2026", "23:59 hrs"],
+            ].map((row) => (
+              <tr
+                key={row[0]}
+                className="border-b border-gray-100 last:border-0"
+              >
+                {row.map((cell, i) => (
+                  <td key={i} className="px-2 py-2 text-gray-700">
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="text-xs text-gray-500 mt-3 leading-relaxed">
+          No se aceptarán registros posteriores a la fecha y hora establecidas
+          para cada fase.
+        </p>
+      </div>
+    ),
+  },
+  {
+    label: "Sistema de puntuación",
+    content: (
+      <div>
+        <ul className="space-y-1 mb-4">
+          {[
+            "Acierto al ganador del encuentro: 1 punto",
+            "Acierto exacto al marcador del encuentro: 2 puntos adicionales",
+          ].map((item) => (
+            <li
+              key={item}
+              className="text-sm text-gray-600 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-red-700 before:font-bold"
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
+        <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
+          El participante que acierte tanto el ganador como el marcador exacto
+          podrá obtener un máximo de <strong>3 puntos por partido</strong>.
+        </div>
+      </div>
+    ),
+  },
+  {
+    label: "Evaluación por fase",
+    content: (
+      <div>
+        <p className="text-sm text-gray-600 leading-relaxed mb-3">
+          Cada fase será evaluada de manera independiente. Los participantes
+          podrán resultar ganadores en una fase específica o en la evaluación
+          acumulada general.
+        </p>
+        <ul className="space-y-1">
+          {[
+            "Registrarse en la fase que deseen",
+            "Participar en una o en varias fases",
+            "Competir únicamente dentro de la fase en la que se hayan registrado",
+          ].map((item) => (
+            <li
+              key={item}
+              className="text-sm text-gray-600 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-red-700 before:font-bold"
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
     ),
   },
   {
     label: "Criterios para determinar ganadores",
     content: (
-      <ul className="space-y-1">
-        {[
-          "Se considerará el mayor número de aciertos por fase",
-          "En empate: se tomará el puntaje mayor de la fase siguiente",
-          "De persistir empate: sorteo aleatorio",
-          "La decisión será definitiva",
-        ].map((item) => (
-          <li
-            key={item}
-            className="text-sm text-gray-600 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-red-700 before:font-bold"
-          >
-            {item}
-          </li>
-        ))}
-      </ul>
+      <div className="space-y-4">
+        <div>
+          <p className="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">
+            Por fase — hasta 100 ganadores
+          </p>
+          <ul className="space-y-1">
+            {[
+              "Se considerará el mayor número de aciertos en la fase correspondiente",
+              "En empate: mayor puntaje acumulado en la fase posterior inmediata",
+              "De persistir empate: mayor puntaje acumulado o sorteo aleatorio",
+            ].map((item) => (
+              <li
+                key={item}
+                className="text-sm text-gray-600 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-red-700 before:font-bold"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">
+            Acumulado general — hasta 3 ganadores
+          </p>
+          <ul className="space-y-1">
+            {[
+              "Mayor puntaje total acumulado en las cuatro fases",
+              "En empate: prioridad al mayor puntaje en la Final",
+              "De persistir: se considera sucesivamente Semifinal y Cuartos",
+              "De continuar empate: sorteo aleatorio",
+            ].map((item) => (
+              <li
+                key={item}
+                className="text-sm text-gray-600 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-red-700 before:font-bold"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
+          La decisión de los organizadores será definitiva e inapelable.
+        </div>
+      </div>
     ),
   },
   {
@@ -135,10 +251,10 @@ const secciones = [
             </thead>
             <tbody>
               {[
-                ["Octavos", "8", "2 pts", "1 pt", "16 pts"],
-                ["Cuartos", "4", "2 pts", "1 pt", "8 pts"],
-                ["Semifinal", "2", "2 pts", "1 pt", "4 pts"],
-                ["Final", "1", "2 pts", "1 pt", "2 pts"],
+                ["Octavos", "8", "2 pts", "1 pt", "24 pts"],
+                ["Cuartos", "4", "2 pts", "1 pt", "12 pts"],
+                ["Semifinal", "2", "2 pts", "1 pt", "6 pts"],
+                ["Final", "1", "2 pts", "1 pt", "3 pts"],
               ].map((row) => (
                 <tr
                   key={row[0]}
@@ -156,7 +272,7 @@ const secciones = [
         </div>
         <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 mt-3 text-sm text-red-900">
           Puntaje máximo acumulado en las cuatro fases:{" "}
-          <strong>30 puntos</strong>.
+          <strong>45 puntos</strong>.
         </div>
       </div>
     ),
@@ -172,7 +288,8 @@ const secciones = [
           { fase: "Final", premio: "Jerseys" },
           {
             fase: "Acumulado",
-            premio: `Kit "Final en Equipo": parrilla portátil, hielera, sillas plegables, kit botanero`,
+            premio:
+              'Kit "Final en Equipo": parrilla portátil, hielera, sillas plegables, kit botanero',
           },
         ].map(({ fase, premio }) => (
           <div
@@ -197,12 +314,18 @@ const secciones = [
       <div className="flex flex-wrap gap-2 mt-1">
         {["Facebook: Marco Polo Aguirre", "Instagram: @marcopoloaguirre"].map(
           (red) => (
-            <span
+            <Link
               key={red}
+              href={
+                red.includes("Facebook")
+                  ? "https://www.facebook.com/MarcoPoloAguirreChavez"
+                  : "https://www.instagram.com/marcopoloaguire/"
+              }
+              target="_blank"
               className="inline-flex items-center gap-1 text-sm text-red-700 bg-red-50 px-3 py-1.5 rounded-full font-semibold"
             >
               {red}
-            </span>
+            </Link>
           ),
         )}
       </div>
@@ -234,10 +357,10 @@ const secciones = [
         <p className="text-sm text-gray-600 mb-2">
           Los organizadores podrán invalidar registros que presenten:
         </p>
-        <ul className="space-y-1">
+        <ul className="space-y-1 mb-3">
           {[
             "Información falsa o incompleta",
-            "Fotografías alteradas o ilegibles",
+            "Fotografías digitales alteradas o ilegibles",
             "Participaciones duplicadas",
             "Registros enviados fuera del periodo establecido",
           ].map((item) => (
@@ -249,6 +372,10 @@ const secciones = [
             </li>
           ))}
         </ul>
+        <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
+          Los organizadores podrán solicitar evidencia adicional para validar
+          cualquier participación.
+        </div>
       </div>
     ),
   },
