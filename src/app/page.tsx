@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Confetti from "../app/components/confeti";
-import AnimatedTitle from "../app/components/AnimatedTitle";
-
+import { useRouter } from "next/navigation";
+import Confetti from "./components/confeti";
+import AnimatedTitle from "./components/AnimatedTitle";
 import Link from "next/link";
 import Image from "next/image";
+import { useParticipante } from "./hooks/useParticipante";
+
 const TARGET = new Date("2026-06-11T13:00:00-06:00");
 
 function pad(n: number) {
@@ -24,15 +26,58 @@ function getTimeLeft() {
 }
 
 export default function Home() {
-  // ✅ null en el servidor, nunca toca Date.now() en SSR
+  const router = useRouter();
+  const { participante, guardar, cargado } = useParticipante();
   const [time, setTime] = useState<ReturnType<typeof getTimeLeft> | null>(null);
 
+  // ── Estado para input de folio (descomenta cuando abra el mundial) ──
+  const [folio, setFolio] = useState("");
+  const [errorFolio, setErrorFolio] = useState("");
+  const [cargandoFolio, setCargandoFolio] = useState(false);
+
   useEffect(() => {
-    // Solo se ejecuta en el cliente
     setTime(getTimeLeft());
     const id = setInterval(() => setTime(getTimeLeft()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Si ya tiene folio guardado y el mundial ya empezó, redirige directo a fase activa
+  useEffect(() => {
+    if (!cargado) return;
+    if (participante && time === null) {
+      router.replace("/fase/1");
+    }
+  }, [cargado, participante, time, router]);
+
+  //── Handler de folio (descomenta cuando abra el mundial) ──
+  async function handleIngresarFolio(e: React.FormEvent) {
+    e.preventDefault();
+    setErrorFolio("");
+    const folioLimpio = folio.trim().toUpperCase();
+    if (!/^MJ-[A-Z2-9]{4}$/.test(folioLimpio)) {
+      setErrorFolio("Formato inválido. Ej: MJ-AB3K");
+      return;
+    }
+    setCargandoFolio(true);
+    try {
+      const res = await fetch("/api/participantes/verificar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folio: folioLimpio }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorFolio(data.error ?? "Folio no encontrado.");
+        return;
+      }
+      guardar({ folio: data.folio, nombre: data.nombre });
+      router.push("/fase/1");
+    } catch {
+      setErrorFolio("Error de conexión. Intenta de nuevo.");
+    } finally {
+      setCargandoFolio(false);
+    }
+  }
 
   const units = [
     { id: "days", label: "Días", value: time?.days },
@@ -45,12 +90,10 @@ export default function Home() {
     <div className="hero-bg min-h-screen flex flex-col items-center bg-[#E6E6E6] relative">
       <Confetti />
 
-      {/* Contenido central */}
       <div className="relative z-10 flex-1 flex items-center justify-center w-full">
-        <div className="text-center">
-          {/* PNG pegado al fondo */}
-
+        <div className="text-center px-4">
           <AnimatedTitle />
+
           <div className="w-full flex justify-center mt-auto">
             <Image
               src="/mpa2.png"
@@ -60,7 +103,10 @@ export default function Home() {
               className=""
             />
           </div>
-          {time === null ? (
+
+          {/* Cargando desde localStorage — evita flash */}
+          {!cargado ? null : time === null ? (
+            // Esqueleto mientras hidrata
             <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-6">
               {units.map(({ id, label }) => (
                 <div
@@ -78,8 +124,10 @@ export default function Home() {
             </div>
           ) : time ? (
             <>
+              {/* ── ANTES DEL MUNDIAL: countdown + botón registrarse ── */}
               <p className="text-xs font-semibold tracking-widest text-[#031D2D] uppercase mb-4">
-                México vs Sudáfrica · Estadio Banorte · 11 jun 2026
+                México vs Sudáfrica <br />· Estadio Ciudad de México · <br />
+                11 jun 2026
               </p>
               <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-10">
                 {units.map(({ id, label, value }) => (
@@ -97,16 +145,66 @@ export default function Home() {
                 ))}
               </div>
               <Link
-                href="/juego"
+                href="/quiniela"
                 className="inline-flex items-center gap-2 bg-[#8D0302] hover:bg-[#6e0202] transition-colors rounded-full px-6 py-2.5 text-sm font-bold text-white tracking-wide uppercase"
               >
-                registrate
+                Regístrate
               </Link>
             </>
           ) : (
-            <p className="text-green-600 font-bold text-2xl tracking-wide">
-              ¡Ya comenzó!
-            </p>
+            <>
+              {/* ── DESPUÉS DEL MUNDIAL: botón + input folio ── */}
+              {/* DESCOMENTA ESTE BLOQUE EL 11 DE JUNIO */}
+
+              <p className="text-sm font-semibold text-[#031D2D] uppercase tracking-widest mb-6">
+                ¡El Mundial ya comenzó! Participa ahora
+              </p>
+
+              <div className="flex flex-col gap-3 max-w-xs mx-auto">
+                <Link
+                  href="/quiniela"
+                  className="w-full text-center bg-[#8D0302] hover:bg-[#6e0202] transition-colors rounded-full px-6 py-3 text-sm font-bold text-white tracking-wide uppercase"
+                >
+                  Regístrate gratis
+                </Link>
+
+                {/* ── INPUT FOLIO — descomentar el 11 de junio ── */}
+
+                <div className="relative">
+                  <p className="text-xs text-gray-500 text-center mb-2">
+                    ¿Ya tienes folio?
+                  </p>
+                  <form
+                    onSubmit={handleIngresarFolio}
+                    className="flex flex-col gap-2"
+                  >
+                    <input
+                      type="text"
+                      value={folio}
+                      onChange={(e) => {
+                        setFolio(e.target.value.toUpperCase());
+                        setErrorFolio("");
+                      }}
+                      placeholder="MJ-XXXX"
+                      maxLength={7}
+                      className="w-full px-4 py-2.5 text-sm text-center font-bold tracking-widest border-2 border-[#8D0302] rounded-full bg-white text-[#031D2D] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-red-700 uppercase"
+                    />
+                    {errorFolio && (
+                      <p className="text-xs text-red-600 text-center">
+                        {errorFolio}
+                      </p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={cargandoFolio}
+                      className="w-full bg-white border-2 border-[#8D0302] text-[#8D0302] hover:bg-[#8D0302] hover:text-white transition-colors rounded-full px-6 py-2.5 text-sm font-bold tracking-wide uppercase"
+                    >
+                      {cargandoFolio ? "Verificando…" : "Ingresar con folio"}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
