@@ -4,10 +4,10 @@ import Link from "next/link";
 import Sparkless from "../components/Sparkles";
 import { useRef, useState, type RefObject } from "react";
 import { Montserrat } from "next/font/google";
+import { useParticipante } from "../hooks/useParticipante";
 
 const montserrat = Montserrat({ weight: "900", subsets: ["latin"] });
 
-// ─── Tipos ────────────────────────────────────────────────────────────────────
 interface FormData {
   nombre: string;
   telefono: string;
@@ -32,7 +32,6 @@ interface RegistroExitoso {
   nombre: string;
 }
 
-// ─── Utilidades ───────────────────────────────────────────────────────────────
 function esMayorDeEdad(fechaStr: string): boolean {
   const nacimiento = new Date(fechaStr);
   const hoy = new Date();
@@ -45,47 +44,44 @@ function esMayorDeEdad(fechaStr: string): boolean {
   return edad > 18 || (edad === 18 && hoy >= cumpleEsteAnio);
 }
 
-// ─── Validación client-side ───────────────────────────────────────────────────
 function validarCampos(data: FormData): FormErrors {
   const errores: FormErrors = {};
-
   if (!data.nombre.trim()) errores.nombre = "El nombre es requerido.";
   else if (data.nombre.trim().length < 3)
     errores.nombre = "Mínimo 3 caracteres.";
   else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/.test(data.nombre))
     errores.nombre = "Solo letras y espacios.";
-
   if (!data.telefono) errores.telefono = "El teléfono es requerido.";
   else if (!/^[0-9]{10}$/.test(data.telefono.replace(/\s/g, "")))
     errores.telefono = "Debe tener 10 dígitos.";
-
   if (!data.fecha_nacimiento) {
     errores.fecha_nacimiento = "La fecha es requerida.";
   } else {
     const d = new Date(data.fecha_nacimiento);
-    const minima = new Date("1900-01-01");
     if (d >= new Date()) errores.fecha_nacimiento = "Fecha inválida.";
-    else if (d < minima) errores.fecha_nacimiento = "Fecha inválida.";
+    else if (d < new Date("1900-01-01"))
+      errores.fecha_nacimiento = "Fecha inválida.";
     else if (!esMayorDeEdad(data.fecha_nacimiento))
       errores.fecha_nacimiento =
         "Debes tener al menos 18 años para participar.";
   }
-
   if (data.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.correo))
     errores.correo = "Correo inválido.";
-
   if (!data.colonia.trim()) errores.colonia = "La colonia es requerida.";
-  else if (data.colonia.trim().length < 5)
-    errores.colonia = "Mínimo 5 caracteres.";
-
+  else if (data.colonia.trim().length < 2)
+    errores.colonia = "Mínimo 2 caracteres.";
   if (!data.aceptaBases)
     errores.aceptaBases = "Debes aceptar las bases para continuar.";
-
   return errores;
 }
 
-// ─── Modal: Recuperar folio ───────────────────────────────────────────────────
-function ModalRecuperarFolio({ onClose }: { onClose: () => void }) {
+function ModalRecuperarFolio({
+  onClose,
+  onRecuperar,
+}: {
+  onClose: () => void;
+  onRecuperar: (folio: string, nombre: string) => void;
+}) {
   const [telefono, setTelefono] = useState("");
   const [fecha, setFecha] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -117,6 +113,7 @@ function ModalRecuperarFolio({ onClose }: { onClose: () => void }) {
         setError(data.error ?? "No encontramos tu registro.");
         return;
       }
+      onRecuperar(data.folio, data.nombre);
       setResultado({ folio: data.folio, nombre: data.nombre });
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
@@ -150,7 +147,6 @@ function ModalRecuperarFolio({ onClose }: { onClose: () => void }) {
             />
           </svg>
         </button>
-
         {!resultado ? (
           <>
             <h3
@@ -199,11 +195,7 @@ function ModalRecuperarFolio({ onClose }: { onClose: () => void }) {
               <button
                 onClick={handleBuscar}
                 disabled={cargando}
-                className={`w-full py-2.5 text-sm font-extrabold tracking-widest uppercase rounded-lg border-2 border-white transition-colors ${
-                  cargando
-                    ? "bg-gray-400 cursor-not-allowed text-white"
-                    : "bg-[#8D0302] hover:bg-[#b52222] text-white cursor-pointer"
-                }`}
+                className={`w-full py-2.5 text-sm font-extrabold tracking-widest uppercase rounded-lg border-2 border-white transition-colors ${cargando ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#8D0302] hover:bg-[#b52222] text-white cursor-pointer"}`}
               >
                 {cargando ? "Buscando…" : "Buscar mi folio"}
               </button>
@@ -260,7 +252,6 @@ function ModalRecuperarFolio({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ─── Pantalla de confirmación de folio ────────────────────────────────────────
 function PantallaFolio({
   registro,
   onContinuar,
@@ -269,7 +260,6 @@ function PantallaFolio({
   onContinuar: () => void;
 }) {
   const [confirmado, setConfirmado] = useState(false);
-
   return (
     <div className="max-w-lg mx-auto bg-white rounded-xl border-6 border-[#8D0302] shadow-lg shadow-[#b4aeae] p-8 text-center relative z-30">
       <div className="w-16 h-16 rounded-full bg-[#8D0302] flex items-center justify-center mx-auto mb-4">
@@ -358,21 +348,19 @@ function PantallaFolio({
       <button
         onClick={onContinuar}
         disabled={!confirmado}
-        className={`w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg border-2 transition-all ${
-          confirmado
-            ? "bg-[#8D0302] hover:bg-[#b52222] text-white border-white cursor-pointer"
-            : "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed"
-        }`}
+        className={`w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg border-2 transition-all ${confirmado ? "bg-[#8D0302] hover:bg-[#b52222] text-white border-white cursor-pointer" : "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed"}`}
       >
-        Continuar
+        Continuar a pronósticos →
       </button>
     </div>
   );
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
 export default function QuinielaPage() {
   const headerRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+
+  // ✅ Hook dentro del componente
+  const { guardar } = useParticipante();
 
   const [form, setForm] = useState<FormData>({
     nombre: "",
@@ -382,7 +370,6 @@ export default function QuinielaPage() {
     colonia: "",
     aceptaBases: false,
   });
-
   const [errores, setErrores] = useState<FormErrors>({});
   const [cargando, setCargando] = useState(false);
   const [registrado, setRegistrado] = useState<RegistroExitoso | null>(null);
@@ -394,9 +381,8 @@ export default function QuinielaPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    if (errores[name as keyof FormErrors]) {
+    if (errores[name as keyof FormErrors])
       setErrores((prev) => ({ ...prev, [name]: undefined }));
-    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -421,21 +407,17 @@ export default function QuinielaPage() {
         }),
       });
       const data = await res.json();
-
-      // Teléfono duplicado → error en campo, NO redirigir
       if (res.status === 409 && data.yaRegistrado) {
         setErrores({
-          telefono: "Este número ya está registrado.",
+          telefono: "Este número ya está registrado. ¿Olvidaste tu folio?",
         });
         return;
       }
-
       if (!res.ok) {
         if (data.campos) {
           const erroresServidor: FormErrors = {};
-          for (const [campo, msgs] of Object.entries(data.campos)) {
+          for (const [campo, msgs] of Object.entries(data.campos))
             erroresServidor[campo as keyof FormErrors] = (msgs as string[])[0];
-          }
           setErrores(erroresServidor);
         } else {
           setErrores({
@@ -444,7 +426,8 @@ export default function QuinielaPage() {
         }
         return;
       }
-
+      // ✅ Guardar en localStorage
+      guardar({ folio: data.folio, nombre: data.nombre });
       setRegistrado({ folio: data.folio, nombre: data.nombre });
     } catch {
       setErrores({
@@ -455,8 +438,14 @@ export default function QuinielaPage() {
     }
   }
 
+  // ✅ Redirige a fase activa
   function handleContinuar() {
     window.location.href = "/bases";
+  }
+
+  // ✅ Guardar en localStorage cuando se recupera folio desde el modal
+  function handleRecuperar(folio: string, nombre: string) {
+    guardar({ folio, nombre });
   }
 
   if (registrado) {
@@ -470,9 +459,11 @@ export default function QuinielaPage() {
   return (
     <>
       {mostrarRecuperar && (
-        <ModalRecuperarFolio onClose={() => setMostrarRecuperar(false)} />
+        <ModalRecuperarFolio
+          onClose={() => setMostrarRecuperar(false)}
+          onRecuperar={handleRecuperar}
+        />
       )}
-
       <div className="bg-[#E6E6E6] min-h-screen">
         <div className="relative z-10 px-2 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
           <div ref={headerRef} className="relative">
@@ -495,14 +486,13 @@ export default function QuinielaPage() {
               />
             </div>
           </div>
-
           <form
             onSubmit={handleSubmit}
             noValidate
             className="max-w-lg mx-auto bg-[#FFFFFF] rounded-b-xl rounded-t-xl border-6 border-[#8D0302] shadow-lg shadow-[#b4aeae] p-5 relative z-30"
             style={{ paddingTop: "1.5rem" }}
           >
-            <h1 className="text-lg font-extrabold text-center tracking-widest uppercase text-[#031D2D] mb-1/2">
+            <h1 className="text-lg font-extrabold text-center tracking-widest uppercase text-[#031D2D] mb-1">
               REGÍSTRATE Y PARTICIPA
             </h1>
             <p className="text-xs font-semibold text-center tracking-widest text-[#031D2D] uppercase mb-2">
@@ -517,7 +507,6 @@ export default function QuinielaPage() {
             >
               Ver bases oficiales →
             </Link>
-
             {errores.general && (
               <div className="mb-2 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-xs text-red-700 font-semibold">
@@ -525,9 +514,7 @@ export default function QuinielaPage() {
                 </p>
               </div>
             )}
-
             <div className="space-y-4">
-              {/* Nombre */}
               <div>
                 <label className="block text-sm font-extrabold text-[#031D2D] mb-1 tracking-wide uppercase">
                   Nombre completo
@@ -544,8 +531,6 @@ export default function QuinielaPage() {
                   <p className="mt-1 text-xs text-red-600">{errores.nombre}</p>
                 )}
               </div>
-
-              {/* Teléfono + Nacimiento */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-extrabold text-[#031D2D] mb-1 tracking-wide uppercase">
@@ -564,6 +549,15 @@ export default function QuinielaPage() {
                     <p className="mt-1 text-xs text-red-600">
                       {errores.telefono}
                     </p>
+                  )}
+                  {errores.telefono?.includes("ya está registrado") && (
+                    <button
+                      type="button"
+                      onClick={() => setMostrarRecuperar(true)}
+                      className="mt-1.5 text-xs text-[#8D0302] hover:underline font-semibold"
+                    >
+                      ¿Olvidaste tu folio? Recupéralo aquí →
+                    </button>
                   )}
                 </div>
                 <div>
@@ -584,8 +578,6 @@ export default function QuinielaPage() {
                   )}
                 </div>
               </div>
-
-              {/* Correo */}
               <div>
                 <label className="block text-sm font-extrabold text-[#031D2D] mb-1 tracking-wide uppercase">
                   Correo electrónico{" "}
@@ -605,8 +597,6 @@ export default function QuinielaPage() {
                   <p className="mt-1 text-xs text-red-600">{errores.correo}</p>
                 )}
               </div>
-
-              {/* Colonia */}
               <div>
                 <label className="block text-sm font-extrabold text-[#031D2D] mb-1 tracking-wide uppercase">
                   Colonia o barrio
@@ -623,8 +613,6 @@ export default function QuinielaPage() {
                   <p className="mt-1 text-xs text-red-600">{errores.colonia}</p>
                 )}
               </div>
-
-              {/* Acepta bases */}
               <div>
                 <div className="flex items-start gap-3 mt-2 cursor-pointer">
                   <input
@@ -655,8 +643,6 @@ export default function QuinielaPage() {
                   </p>
                 )}
               </div>
-
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={cargando}
@@ -689,18 +675,15 @@ export default function QuinielaPage() {
                   "Registrarme"
                 )}
               </button>
-
-              {/* Link recuperar folio — siempre visible */}
-              <div className="text-center pt-1/2">
+              <div className="text-center">
                 <button
                   type="button"
                   onClick={() => setMostrarRecuperar(true)}
-                  className="text-xs text-[#8D0302] hover:text-[#8D0302] transition-colors hover:underline"
+                  className="text-xs text-[#8D0302] hover:underline transition-colors"
                 >
                   ¿Ya te registraste y olvidaste tu folio?
                 </button>
               </div>
-
               <p className="text-xs text-gray-400 text-center leading-relaxed">
                 Tus datos serán utilizados únicamente para fines de registro,
                 contacto y validación de participación de la Quiniela Ciudadana
