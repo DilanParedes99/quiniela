@@ -10,6 +10,13 @@ import { useParticipante } from "./hooks/useParticipante";
 
 const TARGET = new Date("2026-06-11T13:00:00-06:00");
 
+// ── INTERRUPTOR MANUAL ──────────────────────────────────────────────────────
+// false: aunque el countdown llegue a 0, seguimos mostrando "Regístrate"
+//        (registros de Octavos siguen abiertos, partidos no inician aún)
+// true:  activa el bloque de "Ingresa tu folio" + redirección automática
+//        a /fase/1 para quienes ya tienen folio guardado
+const FASES_ABIERTAS = false;
+
 function pad(n: number) {
   return String(Math.floor(n)).padStart(2, "0");
 }
@@ -30,7 +37,6 @@ export default function Home() {
   const { participante, guardar, cargado } = useParticipante();
   const [time, setTime] = useState<ReturnType<typeof getTimeLeft> | null>(null);
 
-  // ── Estado para input de folio (descomenta cuando abra el mundial) ──
   const [folio, setFolio] = useState("");
   const [errorFolio, setErrorFolio] = useState("");
   const [cargandoFolio, setCargandoFolio] = useState(false);
@@ -41,15 +47,14 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
-  // Si ya tiene folio guardado y el mundial ya empezó, redirige directo a fase activa
+  // Solo redirige automáticamente a fase activa si FASES_ABIERTAS está activo
   useEffect(() => {
-    if (!cargado) return;
+    if (!cargado || !FASES_ABIERTAS) return;
     if (participante && time === null) {
       router.replace("/fase/1");
     }
   }, [cargado, participante, time, router]);
 
-  //── Handler de folio (descomenta cuando abra el mundial) ──
   async function handleIngresarFolio(e: React.FormEvent) {
     e.preventDefault();
     setErrorFolio("");
@@ -86,6 +91,9 @@ export default function Home() {
     { id: "secs", label: "Seg", value: time?.secs },
   ];
 
+  // Mostrar countdown solo si aún no llega a cero
+  const mostrarCountdown = time !== null;
+
   return (
     <div className="hero-bg min-h-screen flex flex-col items-center bg-[#E6E6E6] relative">
       <Confetti />
@@ -104,25 +112,24 @@ export default function Home() {
             />
           </div>
 
-          {/* Cargando desde localStorage — evita flash */}
-          {!cargado ? null : time === null ? (
-            // Esqueleto mientras hidrata
-            <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto mb-6">
-              {units.map(({ id, label }) => (
-                <div
-                  key={id}
-                  className="bg-white rounded-xl border border-gray-200 pt-4 pb-3 px-2"
-                >
-                  <span className="block text-5xl font-extrabold text-gray-300 leading-none mb-1">
-                    --
-                  </span>
-                  <span className="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
-                    {label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : time ? (
+          {!cargado ? null : !mostrarCountdown && !FASES_ABIERTAS ? (
+            // ── Countdown llegó a 0 pero las fases aún no abren: seguimos en modo registro ──
+            <>
+              <p className="text-sm font-semibold text-[#031D2D] uppercase tracking-widest mb-6">
+                ¡El Mundial ya comenzó!
+              </p>
+              <p className="text-xs text-gray-500 mb-6 max-w-xs mx-auto leading-relaxed">
+                Regístrate para participar en la Quiniela Ciudadana. Las fases
+                se irán habilitando conforme avance el torneo.
+              </p>
+              <Link
+                href="/quiniela"
+                className="inline-flex items-center gap-2 bg-[#8D0302] hover:bg-[#6e0202] transition-colors rounded-full px-6 py-2.5 text-sm font-bold text-white tracking-wide uppercase"
+              >
+                Regístrate
+              </Link>
+            </>
+          ) : mostrarCountdown ? (
             <>
               {/* ── ANTES DEL MUNDIAL: countdown + botón registrarse ── */}
               <p className="text-xs font-semibold tracking-widest text-[#031D2D] uppercase mb-4">
@@ -153,9 +160,7 @@ export default function Home() {
             </>
           ) : (
             <>
-              {/* ── DESPUÉS DEL MUNDIAL: botón + input folio ── */}
-              {/* DESCOMENTA ESTE BLOQUE EL 11 DE JUNIO */}
-
+              {/* ── FASES_ABIERTAS = true: botón + input folio ── */}
               <p className="text-sm font-semibold text-[#031D2D] uppercase tracking-widest mb-6">
                 ¡El Mundial ya comenzó! Participa ahora
               </p>
@@ -167,8 +172,6 @@ export default function Home() {
                 >
                   Regístrate gratis
                 </Link>
-
-                {/* ── INPUT FOLIO — descomentar el 11 de junio ── */}
 
                 <div className="relative">
                   <p className="text-xs text-gray-500 text-center mb-2">
