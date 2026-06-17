@@ -21,7 +21,7 @@ async function getToken(): Promise<string> {
 
   cachedToken = data.token;
   tokenExpiry = Date.now() + 80 * 24 * 60 * 60 * 1000; // 80 días
-  return cachedToken;
+  return cachedToken!;
 }
 
 export async function wc26Fetch(path: string) {
