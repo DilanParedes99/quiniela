@@ -440,7 +440,7 @@ export default function QuinielaPage() {
 
   // ✅ Redirige a fase activa
   function handleContinuar() {
-    window.location.href = "/bases";
+    window.location.href = "/general";
   }
 
   // ✅ Guardar en localStorage cuando se recupera folio desde el modal
@@ -464,6 +464,7 @@ export default function QuinielaPage() {
           onRecuperar={handleRecuperar}
         />
       )}
+
       <div className="bg-[#E6E6E6] min-h-screen">
         <div className="relative z-10 px-2 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
           <div ref={headerRef} className="relative">
