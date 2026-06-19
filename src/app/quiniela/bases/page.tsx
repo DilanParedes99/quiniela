@@ -186,7 +186,7 @@ const secciones = [
       <div className="space-y-4">
         <div>
           <p className="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">
-            Por fase — hasta 100 ganadores
+            Hasta 100 ganadores
           </p>
           <ul className="space-y-1">
             {[

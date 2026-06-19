@@ -109,7 +109,7 @@ export default async function ResultadosPage() {
           <h1
             className={`${montserrat.className} text-2xl font-black text-[#8D0302] leading-tight`}
           >
-            Resultados & Posiciones
+            TU QUINIELA CIUDADANA
           </h1>
           <p className="text-xs text-gray-400 mt-1 capitalize">{getToday()}</p>
         </div>
@@ -132,7 +132,7 @@ export default async function ResultadosPage() {
         )}
 
         {/* Banner de fase activa */}
-        <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 mb-6 flex items-center justify-between">
+        <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 mb-6 flex items-center justify-between cursor-pointer hover:bg-gray-50 ">
           <div>
             <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-0.5">
               Fase activa
