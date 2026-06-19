@@ -260,9 +260,26 @@ function PantallaFolio({
   onContinuar: () => void;
 }) {
   const [confirmado, setConfirmado] = useState(false);
+
+  const fases = [
+    {
+      icon: "⚽",
+      nombre: "Octavos de Final",
+      fecha: "28 de junio al 3 de julio de 2026",
+    },
+    {
+      icon: "⚽",
+      nombre: "Cuartos de Final",
+      fecha: "4 al 8 de julio de 2026",
+    },
+    { icon: "⚽", nombre: "Semifinal", fecha: "9 al 13 de julio de 2026" },
+    { icon: "🏆", nombre: "Final", fecha: "14 al 18 de julio de 2026" },
+  ];
+
   return (
     <div className="max-w-lg mx-auto bg-white rounded-xl border-6 border-[#8D0302] shadow-lg shadow-[#b4aeae] p-8 text-center relative z-30">
-      <div className="w-16 h-16 rounded-full bg-[#8D0302] flex items-center justify-center mx-auto mb-4">
+      {/* Ícono de éxito */}
+      <div className="w-16 h-16 rounded-full bg-[#8D0302] flex items-center justify-center mx-auto mb-2">
         <svg
           className="w-8 h-8 text-white"
           fill="none"
@@ -277,51 +294,77 @@ function PantallaFolio({
           />
         </svg>
       </div>
+
+      {/* Título */}
       <h2
-        className={`${montserrat.className} text-xl text-[#031D2D] mb-1 uppercase tracking-widest`}
+        className={`${montserrat.className} text-lg font-black text-[#8D0302] uppercase tracking-widest mb-2`}
       >
-        ¡Listo, {registro.nombre.split(" ")[0]}!
+        ¡Ya tienes tu folio de participación!
       </h2>
-      <p className="text-xs text-gray-500 uppercase tracking-widest mb-6">
-        Ya estás registrado en la quiniela
+      <p className="text-xs text-gray-500 leading-relaxed mb-2">
+        Guárdalo, ya que lo necesitarás para registrar tus pronósticos durante
+        cada una de las fases de la Quiniela Ciudadana.
       </p>
-      <div className="bg-[#F8F4B8] border-2 border-dashed border-[#8D0302] rounded-xl p-6 mb-6">
+
+      {/* Folio */}
+      <div className="bg-[#F8F4B8] border-2 border-dashed border-[#8D0302] rounded-xl p-6 mb-2">
         <p className="text-xs font-bold text-[#8D0302] uppercase tracking-widest mb-2">
-          Tu folio de participación
+          Tu folio
         </p>
         <p
-          className={`${montserrat.className} text-4xl text-[#031D2D] tracking-[0.2em] mb-3`}
+          className={`${montserrat.className} text-4xl text-[#031D2D] tracking-[0.2em] mb-1`}
         >
           {registro.folio}
         </p>
-        <p className="text-xs text-gray-500 leading-relaxed">
-          Guarda este folio. Lo necesitarás para participar en las siguientes
-          fases del torneo.
+        <p className="text-xs text-gray-400">{registro.nombre}</p>
+      </div>
+
+      {/* Fases */}
+      <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+        <p className="text-xs font-black text-[#031D2D] uppercase tracking-widest mb-2 text-center">
+          Con este folio podrás participar en:
+        </p>
+        <div className="space-y-2">
+          {fases.map((fase, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <span className="text-base shrink-0">{fase.icon}</span>
+              <div>
+                <p className="text-xs font-bold text-[#031D2D]">
+                  {fase.nombre}
+                </p>
+                <p className="text-[11px] text-gray-500">{fase.fecha}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-2">
+          <span className="text-base">⏰</span>
+          <p className="text-xs text-gray-500">
+            Todos los registros cierran a las{" "}
+            <span className="font-bold text-[#031D2D]">23:59 horas</span>.
+          </p>
+        </div>
+      </div>
+
+      {/* Aviso de regreso */}
+      <div className="bg-[#FEF2F2] border border-[#8D0302]/20 rounded-lg px-4 py-3 mb-3">
+        <p className="text-xs text-[#8D0302] leading-relaxed">
+          No olvides <span className="font-bold">regresar en cada fase</span>{" "}
+          para registrar tus pronósticos y seguir compitiendo por los premios.
         </p>
       </div>
-      <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left space-y-2">
-        <p className="text-xs font-bold text-[#031D2D] uppercase tracking-wide mb-3">
-          ¿Cómo guardar tu folio?
-        </p>
-        {[
-          "Toma una captura de pantalla",
-          "Anótalo en papel o en tus notas",
-          "Si lo olvidas, recupéralo con tu teléfono y fecha de nacimiento",
-        ].map((tip, i) => (
-          <div key={i} className="flex items-start gap-2">
-            <span className="w-5 h-5 rounded-full bg-[#8D0302] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-              {i + 1}
-            </span>
-            <p className="text-xs text-gray-600">{tip}</p>
-          </div>
-        ))}
-      </div>
+
+      {/* Checkbox confirmación */}
       <div
-        className="flex items-start gap-3 mb-6 cursor-pointer text-left"
+        className="flex items-start gap-3 mb-4 cursor-pointer text-left"
         onClick={() => setConfirmado(!confirmado)}
       >
         <div
-          className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${confirmado ? "bg-[#8D0302] border-[#8D0302]" : "bg-white border-gray-300"}`}
+          className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+            confirmado
+              ? "bg-[#8D0302] border-[#8D0302]"
+              : "bg-white border-gray-300"
+          }`}
         >
           {confirmado && (
             <svg
@@ -342,15 +385,21 @@ function PantallaFolio({
         <label className="text-xs text-gray-600 leading-relaxed cursor-pointer">
           Ya guardé mi folio{" "}
           <span className="font-bold text-[#031D2D]">{registro.folio}</span> y
-          entiendo que lo necesito para las siguientes fases.
+          entiendo que lo necesito para registrar mis pronósticos en cada fase.
         </label>
       </div>
+
+      {/* Botón */}
       <button
         onClick={onContinuar}
         disabled={!confirmado}
-        className={`w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg border-2 transition-all ${confirmado ? "bg-[#8D0302] hover:bg-[#b52222] text-white border-white cursor-pointer" : "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed"}`}
+        className={`w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg border-2 transition-all ${
+          confirmado
+            ? "bg-[#8D0302] hover:bg-[#b52222] text-white border-white cursor-pointer"
+            : "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed"
+        }`}
       >
-        Continuar a pronósticos →
+        Entendido →
       </button>
     </div>
   );
