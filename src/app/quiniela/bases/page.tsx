@@ -5,8 +5,9 @@ const secciones = [
     label: "Naturaleza de la dinámica",
     content: (
       <p className="text-sm text-gray-600 leading-relaxed">
-        Dinámica recreativa y familiar que fomenta la convivencia, el espíritu
-        deportivo y el trabajo en equipo durante el Mundial 2026. No tiene fines
+        La Quiniela Ciudadana Mundial 2026 es una dinámica recreativa y familiar
+        que tiene como finalidad fomentar la convivencia, el espíritu deportivo
+        y el trabajo en equipo durante el Mundial 2026. No tiene fines
         electorales ni partidistas.
       </p>
     ),
@@ -16,10 +17,10 @@ const secciones = [
     content: (
       <ul className="space-y-1">
         {[
-          "Mayores de 18 años",
+          "Personas mayores de 18 años",
           "Residentes del municipio de Morelia",
           'Personas que cuenten con el calendario oficial 2026 "Morelia juega en equipo"',
-          "Participación gratuita",
+          "La participación es gratuita",
         ].map((item) => (
           <li
             key={item}
@@ -36,8 +37,10 @@ const secciones = [
     content: (
       <div>
         <p className="text-sm text-gray-600 leading-relaxed mb-4">
-          Registros independientes por cada fase del Mundial, a través de
-          formularios distintos habilitados conforme avance el torneo.
+          La dinámica contempla registros independientes por cada fase del
+          Mundial, a través de formularios distintos habilitados conforme avance
+          el torneo. Cada fase tendrá su propio periodo de registro y su propio
+          formulario digital.
         </p>
         <div className="grid grid-cols-2 gap-2 mb-4">
           {[
@@ -66,9 +69,9 @@ const secciones = [
           {[
             "Llenar la quiniela en el calendario impreso",
             "Escanear el código QR",
-            "Ingresar al formulario de la fase vigente",
-            "Registrar pronósticos",
-            "Subir fotografía clara del calendario llenado a mano",
+            "Ingresar al formulario correspondiente a la fase vigente",
+            "Registrar sus pronósticos",
+            "Subir una fotografía clara del calendario llenado a mano",
             "Aceptar las presentes bases",
           ].map((item) => (
             <li
@@ -80,8 +83,8 @@ const secciones = [
           ))}
         </ul>
         <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
-          Cada fase requiere registro independiente, incluso si participaste en
-          fases anteriores.
+          Cada fase requiere registro independiente, incluso si la persona
+          participó en fases anteriores.
         </div>
       </div>
     ),
@@ -105,8 +108,8 @@ const secciones = [
           </thead>
           <tbody>
             {[
-              ["Octavos", "28 jun – 3 jul 2026", "23:59 hrs"],
-              ["Cuartos", "4 – 8 jul 2026", "23:59 hrs"],
+              ["Octavos de Final", "28 jun – 3 jul 2026", "23:59 hrs"],
+              ["Cuartos de Final", "4 – 8 jul 2026", "23:59 hrs"],
               ["Semifinal", "9 – 13 jul 2026", "23:59 hrs"],
               ["Final", "14 – 18 jul 2026", "23:59 hrs"],
             ].map((row) => (
@@ -149,7 +152,9 @@ const secciones = [
         </ul>
         <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
           El participante que acierte tanto el ganador como el marcador exacto
-          podrá obtener un máximo de <strong>3 puntos por partido</strong>.
+          podrá obtener un máximo de <strong>3 puntos por partido</strong>. La
+          suma de puntos obtenidos en cada encuentro determinará el puntaje
+          total de la fase y del acumulado general.
         </div>
       </div>
     ),
@@ -159,9 +164,9 @@ const secciones = [
     content: (
       <div>
         <p className="text-sm text-gray-600 leading-relaxed mb-3">
-          Cada fase será evaluada de manera independiente. Los participantes
-          podrán resultar ganadores en una fase específica o en la evaluación
-          acumulada general.
+          Cada fase será evaluada de manera independiente conforme al número de
+          aciertos obtenidos. Los participantes podrán resultar ganadores tanto
+          en una fase específica como en la evaluación acumulada general.
         </p>
         <ul className="space-y-1">
           {[
@@ -183,50 +188,33 @@ const secciones = [
   {
     label: "Criterios para determinar ganadores",
     content: (
-      <div className="space-y-4">
-        <div>
-          <p className="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">
-            Hasta 100 ganadores
-          </p>
-          <ul className="space-y-1">
-            {[
-              "Se considerará el mayor número de aciertos en la fase correspondiente",
-              "En empate: mayor puntaje acumulado en la fase posterior inmediata",
-              "De persistir empate: mayor puntaje acumulado o sorteo aleatorio",
-            ].map((item) => (
-              <li
-                key={item}
-                className="text-sm text-gray-600 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-red-700 before:font-bold"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <p className="text-xs font-bold text-red-700 uppercase tracking-wide mb-2">
-            Acumulado general — hasta 3 ganadores
-          </p>
-          <ul className="space-y-1">
-            {[
-              "Mayor puntaje total acumulado en las cuatro fases",
-              "En empate: prioridad al mayor puntaje en la Final",
-              "De persistir: se considera sucesivamente Semifinal y Cuartos",
-              "De continuar empate: sorteo aleatorio",
-            ].map((item) => (
-              <li
-                key={item}
-                className="text-sm text-gray-600 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-red-700 before:font-bold"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="space-y-3">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Podrán resultar ganadores hasta{" "}
+          <strong className="text-[#031D2D]">200 participantes</strong> durante
+          el desarrollo de la dinámica, distribuidos entre las distintas fases
+          conforme a la disponibilidad de premios establecida en estas bases.
+        </p>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          La determinación de los ganadores se realizará considerando el mayor
+          número de aciertos obtenidos en la fase correspondiente. En caso de
+          empate, se aplicarán los criterios de desempate establecidos en las
+          presentes bases.
+        </p>
         <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
           La decisión de los organizadores será definitiva e inapelable.
         </div>
       </div>
+    ),
+  },
+  {
+    label: "Modificaciones",
+    content: (
+      <p className="text-sm text-gray-600 leading-relaxed">
+        Los organizadores podrán realizar ajustes operativos o aclaraciones a la
+        presente dinámica en caso de ser necesario, informándolo oportunamente a
+        través de los medios oficiales.
+      </p>
     ),
   },
   {
@@ -282,28 +270,37 @@ const secciones = [
     content: (
       <div>
         {[
-          { fase: "Octavos", premio: "Termos" },
-          { fase: "Cuartos", premio: "Balones" },
-          { fase: "Semifinal", premio: "Gorras" },
-          { fase: "Final", premio: "Jerseys" },
           {
-            fase: "Acumulado",
+            fase: "Octavos de Final",
+            premio: 'Hasta 100 termos conmemorativos "Morelia juega en equipo"',
+          },
+          { fase: "Cuartos de Final", premio: "Hasta 50 balones oficiales" },
+          { fase: "Semifinal", premio: "Hasta 30 gorras oficiales" },
+          {
+            fase: "Final",
+            premio: "Hasta 20 jerseys oficiales de la Selección Mexicana",
+          },
+          {
+            fase: "Acumulado general",
             premio:
-              'Kit "Final en Equipo": parrilla portátil, hielera, sillas plegables, kit botanero',
+              'Kit "Final en Equipo": parrilla portátil, hielera, sillas plegables y kit botanero. Hasta 3 ganadores.',
           },
         ].map(({ fase, premio }) => (
           <div
             key={fase}
             className="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0"
           >
-            <span className="text-xs font-bold text-red-700 min-w-[5rem] shrink-0">
+            <span className="text-xs font-bold text-red-700 min-w-[6rem] shrink-0">
               {fase}
             </span>
             <span className="text-sm text-gray-700">{premio}</span>
           </div>
         ))}
-        <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 mt-3 text-sm text-red-900">
-          No se entregarán premios en efectivo.
+        <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 mt-3 text-sm text-red-900 leading-relaxed">
+          Los premios son personales e intransferibles, no podrán canjearse por
+          dinero en efectivo ni por otros bienes o servicios. La disponibilidad
+          de modelos, tallas y características estará sujeta a existencia al
+          momento de la entrega.
         </div>
       </div>
     ),
@@ -312,22 +309,25 @@ const secciones = [
     label: "Publicación de resultados",
     content: (
       <div className="flex flex-wrap gap-2 mt-1">
-        {["Facebook: Marco Polo Aguirre", "Instagram: @marcopoloaguirre"].map(
-          (red) => (
-            <Link
-              key={red}
-              href={
-                red.includes("Facebook")
-                  ? "https://www.facebook.com/MarcoPoloAguirreChavez"
-                  : "https://www.instagram.com/marcopoloaguire/"
-              }
-              target="_blank"
-              className="inline-flex items-center gap-1 text-sm text-red-700 bg-red-50 px-3 py-1.5 rounded-full font-semibold"
-            >
-              {red}
-            </Link>
-          ),
-        )}
+        {[
+          {
+            red: "Facebook: Marco Polo Aguirre",
+            url: "https://www.facebook.com/MarcoPoloAguirreChavez",
+          },
+          {
+            red: "Instagram: @marcopoloaguirre",
+            url: "https://www.instagram.com/marcopoloaguire/",
+          },
+        ].map(({ red, url }) => (
+          <Link
+            key={red}
+            href={url}
+            target="_blank"
+            className="inline-flex items-center gap-1 text-sm text-red-700 bg-red-50 px-3 py-1.5 rounded-full font-semibold"
+          >
+            {red}
+          </Link>
+        ))}
       </div>
     ),
   },
@@ -336,9 +336,9 @@ const secciones = [
     content: (
       <ul className="space-y-1">
         {[
-          "Datos usados exclusivamente para contacto relacionado con esta dinámica",
+          "Los datos recabados serán utilizados exclusivamente para fines de contacto relacionados con esta dinámica",
           "No se utilizarán con fines electorales, comerciales ni distintos a los aquí señalados",
-          "No serán compartidos con terceros ajenos a la presente dinámica",
+          "Los datos recabados no serán compartidos con terceros ajenos a la presente dinámica",
         ].map((item) => (
           <li
             key={item}
@@ -380,23 +380,13 @@ const secciones = [
     ),
   },
   {
-    label: "Modificaciones",
-    content: (
-      <p className="text-sm text-gray-600 leading-relaxed">
-        Los organizadores podrán realizar ajustes operativos o aclaraciones a la
-        presente dinámica en caso de ser necesario, informándolo oportunamente a
-        través de los medios oficiales.
-      </p>
-    ),
-  },
-  {
     label: "Carácter de la dinámica",
     content: (
       <p className="text-sm text-gray-600 leading-relaxed">
-        Dinámica con carácter exclusivamente recreativo y de participación
-        ciudadana. La participación no condiciona ni genera relación alguna con
-        programas sociales, apoyos gubernamentales o actividades de carácter
-        electoral.
+        La presente dinámica tiene carácter exclusivamente recreativo y de
+        participación ciudadana. La participación en esta dinámica no condiciona
+        ni genera relación alguna con programas sociales, apoyos gubernamentales
+        o actividades de carácter electoral.
       </p>
     ),
   },
