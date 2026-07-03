@@ -387,11 +387,7 @@ function TarjetaPartido({
         </div>
       </div>
       <div className="mt-2 text-center">
-        {partido.fecha_inicio && (
-          <p className="text-[10px] text-gray-400">
-            {formatFecha(partido.fecha_inicio)}
-          </p>
-        )}
+        {partido.fecha_inicio && <p className="text-[10px] text-gray-400"></p>}
         {!partido.definido && (
           <p className="text-[10px] text-yellow-600 font-semibold mt-0.5">
             Pendiente de confirmar

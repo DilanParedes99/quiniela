@@ -50,7 +50,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 2. Fase activa
+  // 2. Fase activa — incluye registro_cierra_en para que decidirDestino()
+  // pueda detectar si el período de captura ya venció aunque el estado
+  // siga en 'abierta' (el admin lo cambia manualmente)
   const { data: fase } = await supabase
     .from("fases")
     .select("id, nombre, orden, estado, registro_abre_en, registro_cierra_en")
@@ -73,7 +75,13 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     folio: participante.folio,
     nombre: participante.nombre,
-    fase_activa: fase ?? null,
+    fase_activa: fase
+      ? {
+          orden: fase.orden,
+          nombre: fase.nombre,
+          registro_cierra_en: fase.registro_cierra_en,
+        }
+      : null,
     ya_participo: yaParticipo,
   });
 }
