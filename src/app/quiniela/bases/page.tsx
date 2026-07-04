@@ -150,12 +150,6 @@ const secciones = [
             </li>
           ))}
         </ul>
-        <div className="bg-red-50 border-l-2 border-red-700 rounded-r-lg px-4 py-3 text-sm text-red-900 leading-relaxed">
-          El participante que acierte tanto el ganador como el marcador exacto
-          podrá obtener un máximo de <strong>3 puntos por partido</strong>. La
-          suma de puntos obtenidos en cada encuentro determinará el puntaje
-          total de la fase y del acumulado general.
-        </div>
       </div>
     ),
   },
