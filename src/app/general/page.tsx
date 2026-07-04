@@ -1,5 +1,6 @@
 import { Montserrat } from "next/font/google";
 import { wc26Fetch, getMatchesFallback, type OpenMatch } from "@/lib/wc26";
+import QuinielaNav from "../components/QuinielaNav";
 
 const montserrat = Montserrat({
   weight: ["400", "700", "900"],
@@ -29,13 +30,11 @@ function formatHora(dateStr: string) {
 }
 
 function formatHoraFallback(timeStr: string) {
-  // formato: "19:00 UTC-6"
   const [time] = timeStr.split(" ");
   return `${time} hrs`;
 }
 
 export default async function ResultadosPage() {
-  let groups: any[] = [];
   let matches: any[] = [];
   let teams: any[] = [];
   let error = false;
@@ -45,50 +44,37 @@ export default async function ResultadosPage() {
     timeZone: "America/Mexico_City",
   });
 
-  // Intento principal — worldcup26.ir
   try {
-    const [groupsRes, matchesRes, teamsRes] = await Promise.all([
-      wc26Fetch("/get/groups"),
+    const [matchesRes, teamsRes] = await Promise.all([
       wc26Fetch("/get/games"),
       wc26Fetch("/get/teams"),
     ]);
-
     teams = teamsRes.teams ?? [];
     matches = matchesRes.games ?? [];
-    groups = groupsRes.groups ?? [];
-
-    // Si viene vacío también usamos fallback
-    if (matches.length === 0 && groups.length === 0) {
-      throw new Error("Respuesta vacía");
-    }
+    if (matches.length === 0) throw new Error("Respuesta vacía");
   } catch {
     usingFallback = true;
   }
 
-  // Mapa de equipos por ID (solo si hay datos de worldcup26.ir)
   const teamMap: Record<string, any> = {};
   teams.forEach((t: any) => {
     teamMap[t.id] = t;
   });
 
-  // Filtrar partidos de hoy — fuente principal
   const todayMatches = matches.filter((m: any) => {
     if (!m.local_date) return false;
     const [datePart] = m.local_date.split(" ");
     const [month, day, year] = datePart.split("/");
-    const matchDate = `${year}-${month}-${day}`;
-    return matchDate === todayStr;
+    return `${year}-${month}-${day}` === todayStr;
   });
 
-  // Fallback — openfootball
   let fallbackTodayMatches: OpenMatch[] = [];
-
   if (usingFallback) {
     try {
       const all = await getMatchesFallback();
       fallbackTodayMatches = all.filter((m) => m.date === todayStr);
     } catch {
-      error = true; // ambas fuentes fallaron
+      error = true;
     }
   }
 
@@ -114,14 +100,17 @@ export default async function ResultadosPage() {
           <p className="text-xs text-gray-400 mt-1 capitalize">{getToday()}</p>
         </div>
 
-        {/* Error — solo si ambas fuentes fallaron */}
+        {/* QuinielaNav — Client Component independiente */}
+        {/* Hidrata en el cliente sin bloquear el render del servidor */}
+        <QuinielaNav />
+
+        {/* Partidos de hoy — datos FIFA */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center text-sm text-red-600 mb-6">
             No se pudieron cargar los datos. Intenta de nuevo en unos minutos.
           </div>
         )}
 
-        {/* Aviso de fallback */}
         {usingFallback && !error && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 mb-4 text-xs text-yellow-700 flex items-center gap-2">
             <span>⚠️</span>
@@ -131,31 +120,6 @@ export default async function ResultadosPage() {
           </div>
         )}
 
-        {/* Banner de fase activa */}
-        <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 mb-6 flex items-center justify-between cursor-pointer hover:bg-gray-50 ">
-          <div>
-            <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-0.5">
-              Fase activa
-            </p>
-            <p
-              className={`${montserrat.className} text-sm font-black text-[#031D2D]`}
-            >
-              Octavos de Final
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-0.5">
-              Cierre de registro
-            </p>
-            <p
-              className={`${montserrat.className} text-sm font-black text-[#8D0302]`}
-            >
-              28 jun – 3 jul 2026 · 23:59 hrs
-            </p>
-          </div>
-        </div>
-
-        {/* Partidos de hoy */}
         <section className="mb-8">
           <h2
             className={`${montserrat.className} text-xs font-black tracking-widest uppercase text-gray-500 mb-3`}
@@ -163,7 +127,6 @@ export default async function ResultadosPage() {
             ⚽ Partidos de hoy
           </h2>
 
-          {/* Render fuente principal */}
           {!usingFallback && (
             <>
               {todayMatches.length === 0 ? (
@@ -180,7 +143,6 @@ export default async function ResultadosPage() {
                     const hasScore =
                       m.home_score !== null && m.home_score !== undefined;
                     const live = !finished && hasScore;
-
                     return (
                       <div
                         key={m.id}
@@ -260,7 +222,6 @@ export default async function ResultadosPage() {
             </>
           )}
 
-          {/* Render fallback — openfootball */}
           {usingFallback && !error && (
             <>
               {fallbackTodayMatches.length === 0 ? (
