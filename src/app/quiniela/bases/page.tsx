@@ -278,7 +278,7 @@ const secciones = [
           { fase: "Semifinal", premio: "Hasta 30 gorras oficiales" },
           {
             fase: "Final",
-            premio: "Hasta 20 jerseys oficiales de la Selección Mexicana",
+            premio: "Hasta 20 jerseys/chamarras oficiales",
           },
           {
             fase: "Acumulado general",
