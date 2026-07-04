@@ -27,7 +27,7 @@ export interface EstadoParticipante {
  * - No ha participado y fase vigente → "/fase/[orden]"
  */
 export function decidirDestino(estado: EstadoParticipante): string {
-  if (!estado.fase_activa) return "/";
+  if (!estado.fase_activa) return "/general";
 
   const ahora = new Date();
   const cierre = new Date(estado.fase_activa.registro_cierra_en);
@@ -36,7 +36,7 @@ export function decidirDestino(estado: EstadoParticipante): string {
   // Fase en 'abierta' pero el período de captura ya cerró.
   // El admin actualizará el estado manualmente — mientras tanto
   // no tiene sentido redirigir al usuario a una pantalla de error.
-  if (faseVencida) return "/";
+  if (faseVencida) return "/general";
 
   if (estado.ya_participo) return "/mis-pronosticos";
   return `/fase/${estado.fase_activa.orden}`;

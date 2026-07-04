@@ -266,7 +266,7 @@ export default function MisPronosticosPage() {
             {error || "No encontramos tus pronósticos."}
           </p>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/general")}
             className="text-sm text-[#8D0302] hover:underline font-bold"
           >
             ← Volver al inicio
@@ -365,7 +365,7 @@ export default function MisPronosticosPage() {
         </div>
 
         {/* Nav strip — mismo estilo que /general */}
-        <div className="w-full bg-[#031D2D] rounded-xl px-4 py-2.5 flex items-center justify-between mb-6 shadow-md">
+        <div className="w-full bg-[#8D0302] rounded-xl px-4 py-2.5 flex items-center justify-between mb-6 shadow-md">
           <button
             onClick={() => setConfirmarSalida(true)}
             className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-red-500/30 transition-colors rounded-full px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase text-white hover:text-red-300"
@@ -438,7 +438,7 @@ export default function MisPronosticosPage() {
                 onClick={() => setTabActiva(i)}
                 className={`flex-1 py-2 px-1 text-[10px] font-extrabold tracking-wide uppercase rounded-lg transition-all ${
                   tabActiva === i
-                    ? "bg-[#031D2D] text-white"
+                    ? "bg-[#8D0302] text-white"
                     : "text-gray-400 hover:text-[#031D2D]"
                 }`}
               >

@@ -203,7 +203,7 @@ export default function QuinielaNav() {
       <div className="mb-6">
         {/* Nav strip — solo visible si hay folio, solo acciones */}
         {participante && (
-          <div className="w-full bg-[#031D2D] rounded-xl px-4 py-2.5 flex items-center justify-between mb-4 shadow-md">
+          <div className="w-full bg-[#8D0302] rounded-xl px-4 py-2.5 flex items-center justify-between mb-4 shadow-md">
             {/* Cerrar sesión — izquierda */}
             <button
               onClick={() => setConfirmarSalida(true)}
