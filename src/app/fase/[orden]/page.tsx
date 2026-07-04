@@ -102,10 +102,10 @@ function PantallaYaParticipo({ fase, nombre }: { fase: Fase; nombre: string }) {
           </p>
         </div>
         <a
-          href="/rankings"
+          href="/mis-pronosticos"
           className="block w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg bg-[#8D0302] hover:bg-[#b52222] text-white border-2 border-white transition-colors"
         >
-          Ver tabla de posiciones →
+          Ver mis pronósticos →
         </a>
       </div>
     </div>
@@ -347,37 +347,49 @@ function TarjetaPartido({
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <input
-            type="number"
-            min={0}
-            max={30}
-            value={pronostico.goles_local}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={
+              pronostico.goles_local === ""
+                ? ""
+                : String(pronostico.goles_local)
+            }
             onChange={(e) => {
-              const v =
-                e.target.value === ""
-                  ? ""
-                  : Math.max(0, Math.min(20, parseInt(e.target.value)));
-              onChange(partido.id, "goles_local", v);
+              const raw = e.target.value.replace(/[^0-9]/g, "");
+              if (raw === "") {
+                onChange(partido.id, "goles_local", "");
+                return;
+              }
+              const num = parseInt(raw, 10);
+              onChange(partido.id, "goles_local", Math.min(20, num));
             }}
             disabled={deshabilitado}
             className={`${inputClass} ${pronostico.goles_local === "" ? "border-gray-300" : "border-[#8D0302]"}`}
-            placeholder="0"
+            placeholder=""
           />
           <span className="text-xl font-extrabold text-gray-400">—</span>
           <input
-            type="number"
-            min={0}
-            max={30}
-            value={pronostico.goles_visita}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={
+              pronostico.goles_visita === ""
+                ? ""
+                : String(pronostico.goles_visita)
+            }
             onChange={(e) => {
-              const v =
-                e.target.value === ""
-                  ? ""
-                  : Math.max(0, Math.min(20, parseInt(e.target.value)));
-              onChange(partido.id, "goles_visita", v);
+              const raw = e.target.value.replace(/[^0-9]/g, "");
+              if (raw === "") {
+                onChange(partido.id, "goles_visita", "");
+                return;
+              }
+              const num = parseInt(raw, 10);
+              onChange(partido.id, "goles_visita", Math.min(20, num));
             }}
             disabled={deshabilitado}
             className={`${inputClass} ${pronostico.goles_visita === "" ? "border-gray-300" : "border-[#8D0302]"}`}
-            placeholder="0"
+            placeholder=""
           />
         </div>
         <div className="flex-1 text-left">
@@ -387,7 +399,11 @@ function TarjetaPartido({
         </div>
       </div>
       <div className="mt-2 text-center">
-        {partido.fecha_inicio && <p className="text-[10px] text-gray-400"></p>}
+        {partido.fecha_inicio && (
+          <p className="text-[10px] text-gray-400">
+            {formatFecha(partido.fecha_inicio)}
+          </p>
+        )}
         {!partido.definido && (
           <p className="text-[10px] text-yellow-600 font-semibold mt-0.5">
             Pendiente de confirmar
@@ -440,10 +456,10 @@ function PantallaExito({ fase, nombre }: { fase: Fase; nombre: string }) {
           </p>
         </div>
         <a
-          href="/rankings"
+          href="/mis-pronosticos"
           className="block w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg bg-[#8D0302] hover:bg-[#b52222] text-white border-2 border-white transition-colors"
         >
-          Ver tabla de posiciones →
+          Ver mis pronósticos →
         </a>
       </div>
     </div>
@@ -599,24 +615,43 @@ export default function FasePage() {
 
   // ── Validar ──────────────────────────────────────────────────────────────
   function validar(): string | null {
+    let partidosConPronostico = 0;
+
     for (const partido of partidos) {
-      // Solo validar partidos habilitados: definido=true y que no hayan iniciado
+      // Solo validar partidos con definido=true Y con ambos equipos con nombre
+      // definido=true sin equipos = bug de configuración en BD, no bloquear al usuario
       if (!partido.definido) continue;
+      if (!partido.equipo_local?.trim() || !partido.equipo_visita?.trim())
+        continue;
+
       const yaEmpezó = partido.fecha_inicio
         ? new Date(partido.fecha_inicio) <= new Date()
         : false;
       if (yaEmpezó) continue;
 
       const p = pronosticos[partido.id];
-      // "" es campo vacío — 0 es válido (empate)
-      if (!p || p.goles_local === "" || p.goles_visita === "") {
+
+      // Distinguir vacío de cero: "" y NaN son inválidos, 0 es válido
+      const localVacio =
+        !p || p.goles_local === "" || Number.isNaN(Number(p.goles_local));
+      const visitaVacio =
+        !p || p.goles_visita === "" || Number.isNaN(Number(p.goles_visita));
+
+      if (localVacio || visitaVacio) {
         return `Falta el marcador: ${partido.equipo_local} vs ${partido.equipo_visita}.`;
       }
-      // Valores negativos no son válidos
       if ((p.goles_local as number) < 0 || (p.goles_visita as number) < 0) {
         return `El marcador no puede ser negativo: ${partido.equipo_local} vs ${partido.equipo_visita}.`;
       }
+
+      partidosConPronostico++;
     }
+
+    // Bloquear si no hay ningún partido disponible para pronosticar
+    if (partidosConPronostico === 0) {
+      return "No hay partidos disponibles para pronosticar en este momento.";
+    }
+
     if (!foto) return "Debes subir la foto de tu calendario.";
     return null;
   }
