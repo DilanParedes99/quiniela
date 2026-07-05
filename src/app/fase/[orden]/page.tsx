@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
 import { useParticipante } from "../../hooks/useParticipante";
+import { SesionStrip } from "../../components/SesionStrip";
 
 const montserrat = Montserrat({ weight: "900", subsets: ["latin"] });
 
@@ -62,51 +63,96 @@ function tieneEquipos(p: Partido) {
   return p.equipo_local?.trim() && p.equipo_visita?.trim();
 }
 
+// ─── Header compartido — mismo estilo que /mis-pronosticos ───────────────────
+// Reemplaza la franja roja anterior. Incluye el SesionStrip para que el
+// participante pueda cerrar sesión o ir a resultados desde cualquier
+// pantalla de esta ruta, igual que en /mis-pronosticos.
+function FaseHeader({
+  titulo,
+  subtitulo,
+}: {
+  titulo: string;
+  subtitulo?: string;
+}) {
+  return (
+    <div className="max-w-2xl mx-auto px-4 pt-8 pb-0">
+      <div className="text-center mb-6">
+        <div className="flex items-center justify-center gap-4 mb-3">
+          <div className="h-[2px] w-16 bg-gray-400" />
+          <span
+            className={`${montserrat.className} text-xs font-bold tracking-widest uppercase text-gray-500`}
+          >
+            Mundial 2026
+          </span>
+          <div className="h-[2px] w-16 bg-gray-400" />
+        </div>
+        <h1
+          className={`${montserrat.className} text-2xl font-black text-[#8D0302] leading-tight`}
+        >
+          {titulo.toUpperCase()}
+        </h1>
+        {subtitulo && <p className="text-xs text-gray-400 mt-1">{subtitulo}</p>}
+      </div>
+
+      <SesionStrip
+        resultadosHref="/general"
+        resultadosLabel="Resultados del día"
+      />
+    </div>
+  );
+}
+
 // ─── Pantalla: ya participó ───────────────────────────────────────────────────
 function PantallaYaParticipo({ fase, nombre }: { fase: Fase; nombre: string }) {
   return (
-    <div className="min-h-screen bg-[#E6E6E6] flex items-center justify-center px-4">
-      <div className="max-w-sm w-full bg-white rounded-xl border-4 border-[#8D0302] shadow-lg p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#8D0302] flex items-center justify-center mx-auto mb-4">
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+    <div className="min-h-screen bg-[#E6E6E6]">
+      <FaseHeader
+        titulo={fase.nombre}
+        subtitulo={`${nombre.split(" ")[0]} · Ya participaste`}
+      />
+      <div className="flex items-center justify-center px-4 pb-12">
+        <div className="max-w-sm w-full bg-white rounded-xl border-4 border-[#8D0302] shadow-lg p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-[#8D0302] flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h2
+            className={`${montserrat.className} text-xl text-[#031D2D] uppercase tracking-widest mb-2`}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-        <h2
-          className={`${montserrat.className} text-xl text-[#031D2D] uppercase tracking-widest mb-2`}
-        >
-          ¡Ya participaste!
-        </h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Hola{" "}
-          <span className="font-bold text-[#031D2D]">
-            {nombre.split(" ")[0]}
-          </span>
-          , ya enviaste tus pronósticos para{" "}
-          <span className="font-bold text-[#031D2D]">{fase.nombre}</span>.
-        </p>
-        <div className="bg-[#F8F4B8] rounded-xl p-4 mb-6">
-          <p className="text-xs text-gray-600 leading-relaxed">
-            Tu foto del calendario está siendo revisada. Una vez aprobada, tus
-            puntos serán contabilizados al final de la fase.
+            ¡Ya participaste!
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Hola{" "}
+            <span className="font-bold text-[#031D2D]">
+              {nombre.split(" ")[0]}
+            </span>
+            , ya enviaste tus pronósticos para{" "}
+            <span className="font-bold text-[#031D2D]">{fase.nombre}</span>.
           </p>
+          <div className="bg-[#F8F4B8] rounded-xl p-4 mb-6">
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Tu foto del calendario está siendo revisada. Una vez aprobada, tus
+              puntos serán contabilizados al final de la fase.
+            </p>
+          </div>
+          <a
+            href="/mis-pronosticos"
+            className="block w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg bg-[#8D0302] hover:bg-[#b52222] text-white border-2 border-white transition-colors"
+          >
+            Ver mis pronósticos →
+          </a>
         </div>
-        <a
-          href="/mis-pronosticos"
-          className="block w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg bg-[#8D0302] hover:bg-[#b52222] text-white border-2 border-white transition-colors"
-        >
-          Ver mis pronósticos →
-        </a>
       </div>
     </div>
   );
@@ -115,24 +161,27 @@ function PantallaYaParticipo({ fase, nombre }: { fase: Fase; nombre: string }) {
 // ─── Pantalla: fase cerrada ───────────────────────────────────────────────────
 function PantallaFaseCerrada({ fase }: { fase: Fase }) {
   return (
-    <div className="min-h-screen bg-[#E6E6E6] flex items-center justify-center px-4">
-      <div className="max-w-sm w-full bg-white rounded-xl border-2 border-gray-200 p-8 text-center">
-        <p className="text-3xl mb-3">🔒</p>
-        <h2
-          className={`${montserrat.className} text-lg text-[#031D2D] uppercase tracking-widest mb-3`}
-        >
-          {fase.nombre}
-        </h2>
-        <p className="text-sm text-gray-500 mb-2">
-          El período de captura cerró el
-        </p>
-        <p className="text-sm font-bold text-[#8D0302] mb-4">
-          {formatFechaCorta(fase.registro_cierra_en)}
-        </p>
-        <p className="text-xs text-gray-400 leading-relaxed">
-          Conforme a las bases oficiales, no es posible registrar pronósticos
-          fuera del período de captura.
-        </p>
+    <div className="min-h-screen bg-[#E6E6E6]">
+      <FaseHeader titulo={fase.nombre} subtitulo="Captura cerrada" />
+      <div className="flex items-center justify-center px-4 pb-12">
+        <div className="max-w-sm w-full bg-white rounded-xl border-2 border-gray-200 p-8 text-center">
+          <p className="text-3xl mb-3">🔒</p>
+          <h2
+            className={`${montserrat.className} text-lg text-[#031D2D] uppercase tracking-widest mb-3`}
+          >
+            {fase.nombre}
+          </h2>
+          <p className="text-sm text-gray-500 mb-2">
+            El período de captura cerró el
+          </p>
+          <p className="text-sm font-bold text-[#8D0302] mb-4">
+            {formatFechaCorta(fase.registro_cierra_en)}
+          </p>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            Conforme a las bases oficiales, no es posible registrar pronósticos
+            fuera del período de captura.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -156,23 +205,12 @@ function PantallaEquiposPendientes({
 
   return (
     <div className="bg-[#E6E6E6] min-h-screen pb-12">
-      {/* Header */}
-      <div className="bg-[#031D2D] px-4 py-5 text-center">
-        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">
-          Quiniela Ciudadana MarcoPolo · Mundial 2026
-        </p>
-        <h1
-          className={`${montserrat.className} text-2xl text-white uppercase tracking-widest`}
-        >
-          {fase.nombre}
-        </h1>
-        <p className="text-xs text-gray-400 mt-1">
-          Hola,{" "}
-          <span className="text-white font-bold">{nombre.split(" ")[0]}</span>
-        </p>
-      </div>
+      <FaseHeader
+        titulo={fase.nombre}
+        subtitulo={`${nombre.split(" ")[0]} · Cierra: ${cierraEn}`}
+      />
 
-      <div className="max-w-lg mx-auto px-4 pt-6 space-y-4">
+      <div className="max-w-lg mx-auto px-4 space-y-4">
         {/* Banner de progreso */}
         <div className="bg-[#F8F4B8] border border-yellow-300 rounded-xl p-4">
           <div className="flex items-start gap-3">
@@ -422,45 +460,51 @@ function TarjetaPartido({
 // ─── Pantalla de éxito ────────────────────────────────────────────────────────
 function PantallaExito({ fase, nombre }: { fase: Fase; nombre: string }) {
   return (
-    <div className="min-h-screen bg-[#E6E6E6] flex items-center justify-center px-4">
-      <div className="max-w-sm w-full bg-white rounded-xl border-4 border-[#8D0302] shadow-lg p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#8D0302] flex items-center justify-center mx-auto mb-4">
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+    <div className="min-h-screen bg-[#E6E6E6]">
+      <FaseHeader
+        titulo={fase.nombre}
+        subtitulo={`${nombre.split(" ")[0]} · Enviado`}
+      />
+      <div className="flex items-center justify-center px-4 pb-12">
+        <div className="max-w-sm w-full bg-white rounded-xl border-4 border-[#8D0302] shadow-lg p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-[#8D0302] flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h2
+            className={`${montserrat.className} text-xl text-[#031D2D] uppercase tracking-widest mb-2`}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-        <h2
-          className={`${montserrat.className} text-xl text-[#031D2D] uppercase tracking-widest mb-2`}
-        >
-          ¡Listo, {nombre.split(" ")[0]}!
-        </h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Tus pronósticos para{" "}
-          <span className="font-bold text-[#031D2D]">{fase.nombre}</span> fueron
-          enviados correctamente.
-        </p>
-        <div className="bg-[#F8F4B8] rounded-xl p-4 mb-6">
-          <p className="text-xs text-gray-600 leading-relaxed">
-            Tu foto del calendario será revisada por el equipo. Una vez
-            aprobada, tus puntos serán contabilizados al final de la fase.
+            ¡Listo, {nombre.split(" ")[0]}!
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Tus pronósticos para{" "}
+            <span className="font-bold text-[#031D2D]">{fase.nombre}</span>{" "}
+            fueron enviados correctamente.
           </p>
+          <div className="bg-[#F8F4B8] rounded-xl p-4 mb-6">
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Tu foto del calendario será revisada por el equipo. Una vez
+              aprobada, tus puntos serán contabilizados al final de la fase.
+            </p>
+          </div>
+          <a
+            href="/mis-pronosticos"
+            className="block w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg bg-[#8D0302] hover:bg-[#b52222] text-white border-2 border-white transition-colors"
+          >
+            Ver mis pronósticos →
+          </a>
         </div>
-        <a
-          href="/mis-pronosticos"
-          className="block w-full py-3 text-sm font-extrabold tracking-widest uppercase rounded-lg bg-[#8D0302] hover:bg-[#b52222] text-white border-2 border-white transition-colors"
-        >
-          Ver mis pronósticos →
-        </a>
       </div>
     </div>
   );
@@ -811,30 +855,16 @@ export default function FasePage() {
   }
 
   // 6. Hay partidos → formulario (inputs habilitados segun partido.definido)
+  const todosDefinidosCierre = formatFechaCorta(fase.registro_cierra_en);
+
   return (
     <div className="bg-[#E6E6E6] min-h-screen pb-12">
-      <div className="bg-[#031D2D] px-4 py-5 text-center">
-        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">
-          Quiniela Ciudadana MarcoPolo · Mundial 2026
-        </p>
-        <h1
-          className={`${montserrat.className} text-2xl text-white uppercase tracking-widest`}
-        >
-          {fase.nombre}
-        </h1>
-        <p className="text-xs text-gray-400 mt-1">
-          Hola,{" "}
-          <span className="text-white font-bold">
-            {participante.nombre.split(" ")[0]}
-          </span>{" "}
-          · <span className="text-[#F8F4B8]">{participante.folio}</span>
-        </p>
-        <p className="text-[10px] text-yellow-300 mt-1">
-          Cierra: {formatFechaCorta(fase.registro_cierra_en)}
-        </p>
-      </div>
+      <FaseHeader
+        titulo={fase.nombre}
+        subtitulo={`${participante.nombre.split(" ")[0]} · ${participante.folio} · Cierra: ${todosDefinidosCierre}`}
+      />
 
-      <div className="max-w-lg mx-auto px-4 pt-6 space-y-6">
+      <div className="max-w-lg mx-auto px-4 space-y-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs font-bold text-[#031D2D] uppercase tracking-wide mb-2">
             ¿Cómo participar?
