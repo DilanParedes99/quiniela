@@ -34,6 +34,29 @@ function formatHoraFallback(timeStr: string) {
   return `${time} hrs`;
 }
 
+// ─── Fix acotado: normaliza el score crudo de la API externa ─────────────────
+// La API (worldcup26.ir, no oficial, sin contrato documentado) manda el
+// string "null" en vez de null real cuando el partido aún no se juega. Sin
+// esto, `m.home_score !== null` evalúa true (porque "null" es un string, no
+// el valor null de JS) y el "??" tampoco lo intercepta, resultando en el
+// texto literal "null — null" en pantalla.
+//
+// SCOPE DELIBERADAMENTE ACOTADO: esto NO valida si el partido ya empezó según
+// la hora de kickoff. Un partido con score real "0"/"0" antes de arrancar
+// seguirá marcándose "En Vivo" incorrectamente — ese es un bug distinto
+// (falta de chequeo de horario) que no se está resolviendo en este cambio.
+function parseScore(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === "string") {
+    const normalized = raw.trim().toLowerCase();
+    if (normalized === "" || normalized === "null" || normalized === "n/a") {
+      return null;
+    }
+  }
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
 export default async function ResultadosPage() {
   let matches: any[] = [];
   let teams: any[] = [];
@@ -140,8 +163,14 @@ export default async function ResultadosPage() {
                     const away = teamMap[m.away_team_id];
                     const finished =
                       m.finished === true || m.finished === "true";
-                    const hasScore =
-                      m.home_score !== null && m.home_score !== undefined;
+
+                    // Antes: m.home_score !== null && m.home_score !== undefined
+                    // El string "null" pasaba ese chequeo (es truthy) y
+                    // producía el bug. Ahora se normaliza primero.
+                    const homeScore = parseScore(m.home_score);
+                    const awayScore = parseScore(m.away_score);
+                    const hasScore = homeScore !== null && awayScore !== null;
+
                     const live = !finished && hasScore;
                     return (
                       <div
@@ -191,7 +220,7 @@ export default async function ResultadosPage() {
                               <span
                                 className={`${montserrat.className} text-xl font-black text-[#031D2D]`}
                               >
-                                {m.home_score ?? 0} — {m.away_score ?? 0}
+                                {homeScore ?? 0} — {awayScore ?? 0}
                               </span>
                             ) : (
                               <span className="text-xs text-gray-300 font-bold">
