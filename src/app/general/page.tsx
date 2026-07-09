@@ -57,6 +57,51 @@ function parseScore(raw: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+// ─── Redes sociales donde se publican los ganadores ───────────────────────────
+// Array en vez de JSX repetido: agregar una red nueva es una línea, no un
+// bloque duplicado.
+const REDES_GANADORES = [
+  {
+    red: "Facebook: Marco Polo Aguirre",
+    url: "https://www.facebook.com/MarcoPoloAguirreChavez",
+    icono: "facebook" as const,
+  },
+  {
+    red: "Instagram: @marcopoloaguirre",
+    url: "https://www.instagram.com/marcopoloaguire/",
+    icono: "instagram" as const,
+  },
+];
+
+function IconoRed({ tipo }: { tipo: "facebook" | "instagram" }) {
+  if (tipo === "facebook") {
+    return (
+      <svg
+        className="w-4 h-4"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0022 12z" />
+      </svg>
+    );
+  }
+  return (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export default async function ResultadosPage() {
   let matches: any[] = [];
   let teams: any[] = [];
@@ -126,6 +171,33 @@ export default async function ResultadosPage() {
         {/* QuinielaNav — Client Component independiente */}
         {/* Hidrata en el cliente sin bloquear el render del servidor */}
         <QuinielaNav />
+
+        {/* Visita los ganadores — links a redes sociales */}
+        <section className="mb-8">
+          <h2
+            className={`${montserrat.className} text-xs font-black tracking-widest uppercase text-gray-500 mb-3`}
+          >
+            🏆 Visita los ganadores
+          </h2>
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex flex-wrap justify-center gap-2">
+              {REDES_GANADORES.map((r) => (
+                <a
+                  key={r.url}
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white border border-[#8D0302]/40 rounded-full px-5 py-2 text-[#8D0302] hover:border-[#8D0302] hover:bg-[#8D0302]/5 transition-colors"
+                >
+                  <IconoRed tipo={r.icono} />
+                  <span className="text-sm font-semibold">
+                    {r.red.split(":")[0]}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Partidos de hoy — datos FIFA */}
         {error && (
