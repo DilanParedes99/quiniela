@@ -1,8 +1,5 @@
 "use client";
 // src/app/rankings/page.tsx
-//
-// Tabla pública Top 20 — no requiere folio.
-// Se actualiza cuando el admin ejecuta calificar_fase() en Supabase.
 
 import { useEffect, useState } from "react";
 import { Montserrat } from "next/font/google";
@@ -13,49 +10,182 @@ const montserrat = Montserrat({
 });
 
 interface EntradaRanking {
-  posicion_acumulada: number;
-  nombre_participante: string;
-  puntaje_total: number;
+  posicion: number;
+  nombre: string;
+  puntaje_total?: number;
+  puntaje_fase?: number;
 }
 
-// ─── Medalla por posición ─────────────────────────────────────────────────────
+interface TabConfig {
+  id: string;
+  label: string;
+  sublabel: string;
+  orden?: number;
+}
+
+const TABS: TabConfig[] = [
+  { id: "acumulado", label: "Total", sublabel: "30 pts máx" },
+  { id: "fase-1", label: "8vos", sublabel: "Top 100", orden: 1 },
+  { id: "fase-2", label: "4tos", sublabel: "Top 50", orden: 2 },
+  { id: "fase-3", label: "Semis", sublabel: "Top 30", orden: 3 },
+  { id: "fase-4", label: "Final", sublabel: "Top 20", orden: 4 },
+];
+
 function Medalla({ posicion }: { posicion: number }) {
   if (posicion === 1) return <span className="text-xl">🥇</span>;
   if (posicion === 2) return <span className="text-xl">🥈</span>;
   if (posicion === 3) return <span className="text-xl">🥉</span>;
   return (
     <span
-      className={`${montserrat.className} text-sm font-black text-gray-400 w-6 text-center`}
+      className={`${montserrat.className} text-sm font-black text-gray-400 w-6 text-center inline-block`}
     >
       {posicion}
     </span>
   );
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
+function FilaRanking({
+  entrada,
+  esTop3,
+}: {
+  entrada: EntradaRanking;
+  esTop3: boolean;
+}) {
+  const puntaje = entrada.puntaje_total ?? entrada.puntaje_fase ?? 0;
+  return (
+    <div
+      className={`bg-white rounded-xl border px-4 py-3 flex items-center gap-4 ${
+        entrada.posicion === 1
+          ? "border-yellow-300 bg-yellow-50/40"
+          : entrada.posicion === 2
+            ? "border-gray-300 bg-gray-50/40"
+            : entrada.posicion === 3
+              ? "border-orange-200 bg-orange-50/30"
+              : "border-gray-200"
+      }`}
+    >
+      <div className="w-8 flex justify-center shrink-0">
+        <Medalla posicion={entrada.posicion} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p
+          className={`${esTop3 ? `${montserrat.className} font-black` : "font-bold"} text-sm text-[#031D2D] truncate`}
+        >
+          {entrada.nombre}
+        </p>
+      </div>
+      <div className="shrink-0 text-right">
+        <p
+          className={`${montserrat.className} ${esTop3 ? "text-xl text-[#8D0302]" : "text-lg text-[#031D2D]"} font-black`}
+        >
+          {puntaje}
+        </p>
+        <p className="text-[9px] text-gray-400 uppercase tracking-wide">pts</p>
+      </div>
+    </div>
+  );
+}
+
+function ListaRanking({ ranking }: { ranking: EntradaRanking[] }) {
+  if (ranking.length === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+        <p className="text-3xl mb-3">⚽</p>
+        <h2
+          className={`${montserrat.className} text-lg text-[#031D2D] uppercase tracking-widest mb-2`}
+        >
+          Próximamente
+        </h2>
+        <p className="text-sm text-gray-500 leading-relaxed">
+          El ranking se publicará una vez que se califique esta fase.
+        </p>
+      </div>
+    );
+  }
+
+  const top3 = ranking.slice(0, 3);
+  const resto = ranking.slice(3);
+
+  return (
+    <div className="space-y-2">
+      {top3.map((e) => (
+        <FilaRanking key={`${e.posicion}-${e.nombre}`} entrada={e} esTop3 />
+      ))}
+      {resto.length > 0 && (
+        <>
+          <div className="flex items-center gap-3 py-1">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+              {ranking.length} participantes
+            </span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+          {resto.map((e) => (
+            <FilaRanking
+              key={`${e.posicion}-${e.nombre}`}
+              entrada={e}
+              esTop3={false}
+            />
+          ))}
+        </>
+      )}
+      <p className="text-[10px] text-gray-400 text-center pt-4 pb-2 leading-relaxed">
+        En caso de empate, el desempate se resuelve en la siguiente fase.
+      </p>
+    </div>
+  );
+}
+
 export default function RankingsPage() {
+  const [tabActiva, setTabActiva] = useState("acumulado");
   const [ranking, setRanking] = useState<EntradaRanking[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/rankings/acumulado")
+    setCargando(true);
+    setError("");
+    setRanking([]);
+
+    const tab = TABS.find((t) => t.id === tabActiva);
+    const url =
+      tab?.orden !== undefined
+        ? `/api/rankings/fase?orden=${tab.orden}`
+        : "/api/rankings/acumulado";
+
+    fetch(url)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) {
           setError(data.error);
           return;
         }
-        setRanking(data.ranking);
+        const lista: EntradaRanking[] = (data.ranking ?? []).map(
+          (row: Record<string, unknown>, idx: number) => ({
+            posicion:
+              (row.posicion as number) ??
+              (row.posicion_acumulada as number) ??
+              idx + 1,
+            nombre:
+              (row.nombre_participante as string) ??
+              (row.nombre as string) ??
+              "",
+            puntaje_total: row.puntaje_total as number | undefined,
+            puntaje_fase: row.puntaje_fase as number | undefined,
+          }),
+        );
+        setRanking(lista);
       })
       .catch(() => setError("Error de conexión. Intenta de nuevo."))
       .finally(() => setCargando(false));
-  }, []);
+  }, [tabActiva]);
+
+  const tabActual = TABS.find((t) => t.id === tabActiva)!;
 
   return (
     <div className="bg-[#E6E6E6] min-h-screen pb-12">
       <div className="max-w-2xl mx-auto px-4 pt-8">
-        {/* Header — mismo estilo que /general y /mis-pronosticos */}
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-4 mb-3">
             <div className="h-[2px] w-16 bg-gray-400" />
@@ -72,23 +202,39 @@ export default function RankingsPage() {
             TABLA DE POSICIONES
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Quiniela Ciudadana MarcoPolo · Top 20
+            Quiniela Ciudadana MarcoPolo
           </p>
         </div>
 
-        {/* Navegación */}
-        <div className="flex items-center justify-between mb-6">
-          <a
-            href="/general"
-            className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-gray-500 hover:text-[#031D2D] transition-colors"
-          ></a>
+        {/* Nav */}
+        <div className="flex items-center justify-between mb-5">
           <p className="text-[10px] text-gray-400 uppercase tracking-wide">
-            Puntaje acumulado · máx 30 pts
+            {tabActual.sublabel}
           </p>
         </div>
 
-        {/* Loading */}
-        {cargando && (
+        {/* Tabs */}
+        <div className="bg-white rounded-xl border border-gray-200 p-1 mb-5 flex gap-1 overflow-x-auto">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setTabActiva(tab.id)}
+              className={`flex-1 py-2 px-1 rounded-lg transition-all shrink-0 ${
+                tabActiva === tab.id
+                  ? "bg-[#8D0302] text-white"
+                  : "text-gray-400 hover:text-[#8D0302]"
+              }`}
+            >
+              <p className="text-[10px] font-extrabold tracking-wide uppercase">
+                {tab.label}
+              </p>
+              <p className="text-[9px] mt-0.5 text-gray-300">{tab.sublabel}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Contenido */}
+        {cargando ? (
           <div className="flex flex-col items-center gap-3 py-16">
             <svg
               className="animate-spin h-8 w-8 text-[#8D0302]"
@@ -113,111 +259,12 @@ export default function RankingsPage() {
               Cargando ranking…
             </p>
           </div>
-        )}
-
-        {/* Error */}
-        {!cargando && error && (
+        ) : error ? (
           <div className="bg-white rounded-xl border border-red-200 p-6 text-center">
             <p className="text-sm text-red-600 font-semibold">{error}</p>
           </div>
-        )}
-
-        {/* Sin datos */}
-        {!cargando && !error && ranking.length === 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <p className="text-3xl mb-3">⚽</p>
-            <h2
-              className={`${montserrat.className} text-lg text-[#031D2D] uppercase tracking-widest mb-2`}
-            >
-              Próximamente
-            </h2>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              El ranking se publicará una vez que se califique la primera fase.
-            </p>
-          </div>
-        )}
-
-        {/* Tabla de posiciones */}
-        {!cargando && !error && ranking.length > 0 && (
-          <div className="space-y-2">
-            {/* Top 3 destacado */}
-            {ranking.slice(0, 3).map((entrada) => (
-              <div
-                key={`${entrada.posicion_acumulada}-${entrada.nombre_participante}`}
-                className={`bg-white rounded-xl border shadow-sm px-4 py-3 flex items-center gap-4 ${
-                  entrada.posicion_acumulada === 1
-                    ? "border-yellow-300 bg-yellow-50/40"
-                    : entrada.posicion_acumulada === 2
-                      ? "border-gray-300 bg-gray-50/40"
-                      : "border-orange-200 bg-orange-50/30"
-                }`}
-              >
-                <div className="w-8 flex justify-center shrink-0">
-                  <Medalla posicion={entrada.posicion_acumulada} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className={`${montserrat.className} text-sm font-black text-[#031D2D] truncate`}
-                  >
-                    {entrada.nombre_participante}
-                  </p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p
-                    className={`${montserrat.className} text-xl font-black text-[#8D0302]`}
-                  >
-                    {entrada.puntaje_total}
-                  </p>
-                  <p className="text-[9px] text-gray-400 uppercase tracking-wide">
-                    pts
-                  </p>
-                </div>
-              </div>
-            ))}
-
-            {/* Divisor */}
-            {ranking.length > 3 && (
-              <div className="flex items-center gap-3 py-1">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-                  Top 20
-                </span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-            )}
-
-            {/* Posiciones 4-20 */}
-            {ranking.slice(3).map((entrada) => (
-              <div
-                key={`${entrada.posicion_acumulada}-${entrada.nombre_participante}`}
-                className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-4"
-              >
-                <div className="w-8 flex justify-center shrink-0">
-                  <Medalla posicion={entrada.posicion_acumulada} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-[#031D2D] truncate">
-                    {entrada.nombre_participante}
-                  </p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p
-                    className={`${montserrat.className} text-lg font-black text-[#031D2D]`}
-                  >
-                    {entrada.puntaje_total}
-                  </p>
-                  <p className="text-[9px] text-gray-400 uppercase tracking-wide">
-                    pts
-                  </p>
-                </div>
-              </div>
-            ))}
-
-            {/* Nota al pie */}
-            <p className="text-[10px] text-gray-400 text-center pt-4 pb-2 leading-relaxed">
-              El ranking se actualiza conforme avanzan las fases del torneo.
-            </p>
-          </div>
+        ) : (
+          <ListaRanking ranking={ranking} />
         )}
       </div>
     </div>

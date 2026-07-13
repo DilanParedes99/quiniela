@@ -1,8 +1,7 @@
 // src/app/api/rankings/acumulado/route.ts
 //
 // Retorna el ranking acumulado top 20 desde v_ranking_acumulado.
-// Endpoint público — no requiere folio.
-// Se actualiza manualmente al ejecutar calificar_fase() en Supabase.
+// Posición secuencial simple — sin agrupar empates.
 
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -27,5 +26,12 @@ export async function GET() {
     );
   }
 
-  return NextResponse.json({ ranking: data ?? [] });
+  // Posición secuencial simple — ignora posicion_acumulada de la vista
+  const ranking = (data ?? []).map((row, idx) => ({
+    posicion: idx + 1,
+    nombre_participante: row.nombre_participante,
+    puntaje_total: row.puntaje_total ?? 0,
+  }));
+
+  return NextResponse.json({ ranking });
 }
